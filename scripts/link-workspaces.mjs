@@ -70,12 +70,17 @@ for (const apiFile of ['index', 'server']) {
   fs.writeFileSync(path.join(distDir, `${apiFile}.js`), jsOutput, 'utf8');
 }
 
-const webIndexHtml = path.resolve('apps', 'web', 'public', 'index.html');
-if (fs.existsSync(webIndexHtml)) {
-  fs.copyFileSync(webIndexHtml, path.join(distPublicDir, 'index.html'));
+const webPublicDir = path.resolve('apps', 'web', 'public');
+if (fs.existsSync(webPublicDir)) {
   const apiPublicDir = path.resolve('apps', 'api', 'public');
   fs.mkdirSync(apiPublicDir, { recursive: true });
-  fs.copyFileSync(webIndexHtml, path.join(apiPublicDir, 'index.html'));
+  for (const file of fs.readdirSync(webPublicDir)) {
+    const srcFile = path.join(webPublicDir, file);
+    if (fs.statSync(srcFile).isFile()) {
+      fs.copyFileSync(srcFile, path.join(distPublicDir, file));
+      fs.copyFileSync(srcFile, path.join(apiPublicDir, file));
+    }
+  }
 }
 
 console.log(

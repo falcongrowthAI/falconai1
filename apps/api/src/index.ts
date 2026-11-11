@@ -5,7 +5,7 @@ import {
   type ServerResponse,
 } from 'node:http';
 import { randomUUID } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -936,6 +936,26 @@ export class FalconGrowthApiServer {
 
     // 6. Servidor da Aplicação Web (FALCON VIRTUAL OFFICE 3D + Dashboard Fallback)
     if (method === 'GET') {
+      const cleanPath = pathname.replace(/^\//, '');
+      const candidateStatic = join(this.webPublicDir, cleanPath);
+      if (cleanPath && existsSync(candidateStatic) && statSync(candidateStatic).isFile()) {
+        const ext = cleanPath.split('.').pop()?.toLowerCase();
+        const contentType =
+          ext === 'png' ? 'image/png' :
+          ext === 'ico' ? 'image/x-icon' :
+          ext === 'svg' ? 'image/svg+xml' :
+          ext === 'json' ? 'application/json' :
+          ext === 'js' ? 'application/javascript' :
+          ext === 'css' ? 'text/css' : 'application/octet-stream';
+        const fileBuf = readFileSync(candidateStatic);
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=86400',
+        });
+        res.end(fileBuf);
+        return;
+      }
+
       const indexFile = join(this.webPublicDir, 'index.html');
       if (existsSync(indexFile)) {
         const html = readFileSync(indexFile, 'utf8');
