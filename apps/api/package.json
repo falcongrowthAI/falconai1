@@ -3,18 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "scripts": {
-    "start": "node src/server.ts",
-    "test": "node --test src/api.test.ts"
+  "main": "./dist/server.js",
+  "engines": {
+    "node": "22.x"
   },
-  "dependencies": {
-    "@falcon/config": "1.0.0",
-    "@falcon/contracts": "1.0.0",
-    "@falcon/security": "1.0.0",
-    "@falcon/db-core": "1.0.0",
-    "@falcon/db-tenant": "1.0.0",
-    "@falcon/ai-runtime": "1.0.0",
-    "@falcon/office-engine": "1.0.0"
+  "scripts": {
+    "start": "node dist/server.js",
+    "test": "node --test src/api.test.ts"
   }
 }

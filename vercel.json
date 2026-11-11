@@ -4,7 +4,7 @@
     "api": {
       "root": "apps/api",
       "runtime": "node",
-      "entrypoint": "src/server.ts",
+      "entrypoint": "dist/server.js",
       "bindings": [
         {
           "type": "service",
@@ -16,11 +16,13 @@
     },
     "server": {
       "root": "pixel-agents-main/server",
-      "framework": "fastify"
+      "runtime": "node",
+      "entrypoint": "src/index.js"
     },
     "webview-ui": {
       "root": "pixel-agents-main/webview-ui",
-      "framework": "vite"
+      "buildCommand": "node build-vercel.mjs",
+      "outputDirectory": "dist"
     }
   },
   "rewrites": [

@@ -6,7 +6,8 @@ import {
 } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   BrandMemoryCategory,
   BrandMemoryLevel,
@@ -58,11 +59,18 @@ export class FalconGrowthApiServer {
     });
     this.router = new TenantProvisionerAndRouter(this.core);
     this.runtime = new FalconAiRuntime({ core: this.core });
-    const candidateRootWeb = resolve(process.cwd(), 'apps', 'web', 'public');
-    const candidateSiblingWeb = resolve(process.cwd(), '..', 'web', 'public');
+    const moduleDir = dirname(fileURLToPath(import.meta.url));
+    const candidates = [
+      options.webPublicDir,
+      resolve(moduleDir, 'public'),
+      resolve(moduleDir, '..', 'public'),
+      resolve(process.cwd(), 'apps', 'web', 'public'),
+      resolve(process.cwd(), 'public'),
+      resolve(process.cwd(), '..', 'web', 'public'),
+    ].filter((c): c is string => Boolean(c));
     this.webPublicDir =
-      options.webPublicDir ??
-      (existsSync(candidateRootWeb) ? candidateRootWeb : candidateSiblingWeb);
+      candidates.find((dir) => existsSync(join(dir, 'index.html'))) ??
+      resolve(process.cwd(), 'apps', 'web', 'public');
   }
 
   getOrCreateOfficeWorld(

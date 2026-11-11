@@ -6,12 +6,5 @@
   "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
-  },
-  "dependencies": {
-    "@falcon/config": "1.0.0",
-    "@falcon/contracts": "1.0.0",
-    "@falcon/security": "1.0.0",
-    "@falcon/db-core": "1.0.0",
-    "@falcon/db-tenant": "1.0.0"
   }
 }
