@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FALCON GROWTH — Sua agência. Sua equipe. Sua inteligência.</title>
+  <title>FALCON GROWTH | Sua agência. Sua equipe. Sua inteligência.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -108,31 +108,86 @@
     }
     .workspace {
       flex: 1;
-      display: grid;
-      grid-template-columns: 250px 1fr 390px;
+      display: flex;
+      position: relative;
       overflow: hidden;
     }
     .sidebar {
+      width: 256px;
+      flex-shrink: 0;
       background: var(--bg-panel);
       border-right: 1px solid var(--border);
-      padding: 14px;
+      padding: 14px 12px;
       overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
+      transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), padding 0.22s ease;
+    }
+    .sidebar.collapsed {
+      width: 68px;
+      padding: 14px 8px;
+    }
+    .sidebar-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 4px 10px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar.collapsed .sidebar-header-row {
+      justify-content: center;
+      padding: 2px 0 10px;
+    }
+    .sidebar-toggle-btn {
+      width: 100%;
+      background: var(--bg-card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+    }
+    .sidebar-toggle-btn:hover {
+      border-color: #00aef5;
+      color: #00aef5;
+    }
+    .sidebar.collapsed .sidebar-toggle-btn {
+      justify-content: center;
+      padding: 9px 0;
+    }
+    .sidebar.collapsed .sidebar-toggle-label {
+      display: none;
+    }
+    .sidebar.collapsed .sidebar-chevron-icon {
+      transform: rotate(180deg);
     }
     .nav-group-label {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--muted);
-      margin: 10px 6px 4px;
+      margin: 10px 8px 4px;
       font-weight: 700;
+      white-space: nowrap;
+    }
+    .sidebar.collapsed .nav-group-label {
+      display: none;
     }
     .nav-btn {
       width: 100%;
       text-align: left;
-      padding: 9px 12px;
+      padding: 9px 11px;
       border-radius: 8px;
       background: transparent;
       color: var(--text);
@@ -140,8 +195,29 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
+      gap: 11px;
+      font-size: 12.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .nav-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      stroke: currentColor;
+      stroke-width: 1.85;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .sidebar.collapsed .nav-btn {
+      justify-content: center;
+      padding: 11px 0;
+      gap: 0;
+    }
+    .sidebar.collapsed .nav-label {
+      display: none;
     }
     .nav-btn.active, .nav-btn:hover {
       background: rgba(0, 174, 245, 0.14);
@@ -149,6 +225,8 @@
       color: #00aef5;
     }
     .center-stage {
+      flex: 1;
+      min-width: 0;
       position: relative;
       background: radial-gradient(circle at center, #0c1d30 0%, #07111c 75%, #040a11 100%);
       display: flex;
@@ -183,11 +261,27 @@
       align-items: center;
       gap: 10px;
     }
+    .hud-btn-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    .hud-btn-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
     .hud-bottom {
       position: absolute;
-      bottom: 14px;
+      bottom: 18px;
       left: 14px;
-      right: 14px;
+      right: 92px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
@@ -210,16 +304,118 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .dpad button:hover {
+      border-color: #00aef5;
+      color: #00aef5;
+    }
+    .dpad button svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .floating-menu-btn {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #00aef5, #2d80d5);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 10px 28px rgba(0, 174, 245, 0.35), 0 0 0 1px rgba(7, 17, 28, 0.8);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .floating-menu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(0, 174, 245, 0.48);
+    }
+    .floating-menu-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
     .right-drawer {
-      background: var(--bg-panel);
-      border-left: 1px solid var(--border);
+      position: fixed;
+      right: 18px;
+      bottom: 84px;
+      width: 400px;
+      max-height: calc(100vh - 164px);
+      background: rgba(5, 12, 20, 0.97);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.72), 0 0 24px rgba(0, 174, 245, 0.14);
       padding: 16px;
       overflow-y: auto;
-      display: flex;
+      display: none;
       flex-direction: column;
       gap: 14px;
+      z-index: 55;
+    }
+    .right-drawer.open {
+      display: flex;
+    }
+    .drawer-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-top-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .drawer-close-btn {
+      background: var(--bg-card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .drawer-close-btn:hover {
+      border-color: #00aef5;
+      color: #ffffff;
+    }
+    .drawer-close-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
     .card {
       background: var(--bg-card);
@@ -230,7 +426,24 @@
       flex-direction: column;
       gap: 8px;
     }
-    .card h3 { font-size: 14px; color: #00aef5; }
+    .card h3 {
+      font-size: 13.5px;
+      color: #00aef5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+    .card h3 svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      stroke: #00aef5;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
     .badge {
       display: inline-block;
       padding: 2px 8px;
@@ -274,56 +487,134 @@
     <div class="top-controls">
       <span id="dbInstanceBadge" class="badge badge-ok">DB Isolado: falcon_tenant_hq (HEALTHY)</span>
       <button class="btn" id="toggleFallbackBtn" onclick="toggleFallbackMode()">
-        Alternar Modo: Escritório 3D / Dashboard Tradicional
+        Alternar Visualização: Escritório 3D / Painel Executivo
       </button>
-      <button class="btn btn-primary" onclick="openModule('FALCON_COMMAND')">
-        + Solicitar Demanda ao Head de Marketing
+      <button class="btn btn-primary" onclick="openModule('FALCON_COMMAND', true)">
+        Solicitar Demanda ao Head de Marketing
       </button>
     </div>
   </header>
 
   <div class="workspace">
-    <aside class="sidebar">
+    <aside class="sidebar" id="mainSidebar">
+      <div class="sidebar-header-row">
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Recolher ou expandir menu lateral">
+          <span class="sidebar-toggle-label">Recolher Menu</span>
+          <svg class="sidebar-chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="11 17 6 12 11 7"></polyline>
+            <polyline points="18 17 13 12 18 7"></polyline>
+          </svg>
+        </button>
+      </div>
+
       <div class="nav-group-label">Experiência Central</div>
-      <button class="nav-btn active" data-mod="VIRTUAL_OFFICE" onclick="openModule('VIRTUAL_OFFICE')">
-        <span>🏢 Escritório Virtual 3D</span>
+      <button class="nav-btn active" data-mod="VIRTUAL_OFFICE" onclick="openModule('VIRTUAL_OFFICE', false)" title="Escritório Virtual 3D">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3L4 7.5v9L12 21l8-4.5v-9L12 3z"></path>
+          <path d="M12 12l8-4.5"></path>
+          <path d="M12 12v9"></path>
+          <path d="M12 12L4 7.5"></path>
+        </svg>
+        <span class="nav-label">Escritório Virtual 3D</span>
       </button>
-      <button class="nav-btn" data-mod="OFFICE_BUILDER" onclick="openModule('OFFICE_BUILDER')">
-        <span>🛠️ Office Builder (Construção)</span>
-      </button>
-
-      <div class="nav-group-label">Inteligência & Equipe</div>
-      <button class="nav-btn" data-mod="FALCON_COMMAND" onclick="openModule('FALCON_COMMAND')">
-        <span>⚡ Falcon Command & WhatsApp</span>
-      </button>
-      <button class="nav-btn" data-mod="FALCON_SETUP" onclick="openModule('FALCON_SETUP')">
-        <span>🧭 Falcon Setup (11 Etapas)</span>
-      </button>
-      <button class="nav-btn" data-mod="FALCON_BRAND_INTELLIGENCE" onclick="openModule('FALCON_BRAND_INTELLIGENCE')">
-        <span>🧠 Brand Intelligence</span>
-      </button>
-      <button class="nav-btn" data-mod="FALCON_AI_TEAM" onclick="openModule('FALCON_AI_TEAM')">
-        <span>🤖 Equipe de 11 Agentes IA</span>
+      <button class="nav-btn" data-mod="OFFICE_BUILDER" onclick="openModule('OFFICE_BUILDER', true)" title="Office Builder (Construção)">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <path d="M3 9h18"></path>
+          <path d="M9 21V9"></path>
+        </svg>
+        <span class="nav-label">Office Builder (Construção)</span>
       </button>
 
-      <div class="nav-group-label">Operação & Entregas</div>
-      <button class="nav-btn" data-mod="PROJECTS_TASKS" onclick="openModule('PROJECTS_TASKS')">
-        <span>📋 Projetos & Tarefas (DAG)</span>
+      <div class="nav-group-label">Inteligência e Equipe</div>
+      <button class="nav-btn" data-mod="FALCON_COMMAND" onclick="openModule('FALCON_COMMAND', true)" title="Falcon Command e WhatsApp">
+        <svg viewBox="0 0 24 24">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span class="nav-label">Falcon Command e WhatsApp</span>
       </button>
-      <button class="nav-btn" data-mod="FALCON_STUDIO" onclick="openModule('FALCON_STUDIO')">
-        <span>🎨 Falcon Studio (Versões)</span>
+      <button class="nav-btn" data-mod="FALCON_SETUP" onclick="openModule('FALCON_SETUP', true)" title="Falcon Setup (11 Etapas)">
+        <svg viewBox="0 0 24 24">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line>
+          <line x1="20" y1="12" x2="20" y2="3"></line>
+          <line x1="1" y1="14" x2="7" y2="14"></line>
+          <line x1="9" y1="8" x2="15" y2="8"></line>
+          <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+        <span class="nav-label">Falcon Setup (11 Etapas)</span>
       </button>
-      <button class="nav-btn" data-mod="FALCON_APPROVALS" onclick="openModule('FALCON_APPROVALS')">
-        <span>✅ Falcon Approvals (Trava)</span>
+      <button class="nav-btn" data-mod="FALCON_BRAND_INTELLIGENCE" onclick="openModule('FALCON_BRAND_INTELLIGENCE', true)" title="Brand Intelligence">
+        <svg viewBox="0 0 24 24">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span class="nav-label">Brand Intelligence</span>
       </button>
-      <button class="nav-btn" data-mod="FALCON_SOCIAL" onclick="openModule('FALCON_SOCIAL')">
-        <span>📅 Falcon Social & Publicação</span>
+      <button class="nav-btn" data-mod="FALCON_AI_TEAM" onclick="openModule('FALCON_AI_TEAM', true)" title="Equipe de 11 Especialistas">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span class="nav-label">Equipe de 11 Especialistas</span>
       </button>
-      <button class="nav-btn" data-mod="FALCON_CRM" onclick="openModule('FALCON_CRM')">
-        <span>💼 Falcon CRM Comercial</span>
+
+      <div class="nav-group-label">Operação e Entregas</div>
+      <button class="nav-btn" data-mod="PROJECTS_TASKS" onclick="openModule('PROJECTS_TASKS', true)" title="Projetos e Tarefas (DAG)">
+        <svg viewBox="0 0 24 24">
+          <line x1="6" y1="3" x2="6" y2="15"></line>
+          <circle cx="18" cy="6" r="3"></circle>
+          <circle cx="6" cy="18" r="3"></circle>
+          <path d="M18 9a9 9 0 0 1-9 9"></path>
+        </svg>
+        <span class="nav-label">Projetos e Tarefas (DAG)</span>
       </button>
-      <button class="nav-btn" data-mod="FALCON_PERFORMANCE" onclick="openModule('FALCON_PERFORMANCE')">
-        <span>📈 Falcon Performance & Core</span>
+      <button class="nav-btn" data-mod="FALCON_STUDIO" onclick="openModule('FALCON_STUDIO', true)" title="Falcon Studio (Versões)">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+          <path d="M2 2l7.586 7.586"></path>
+          <circle cx="11" cy="11" r="2"></circle>
+        </svg>
+        <span class="nav-label">Falcon Studio (Versões)</span>
+      </button>
+      <button class="nav-btn" data-mod="FALCON_APPROVALS" onclick="openModule('FALCON_APPROVALS', true)" title="Falcon Approvals (Governança)">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+        <span class="nav-label">Falcon Approvals (Trava)</span>
+      </button>
+      <button class="nav-btn" data-mod="FALCON_SOCIAL" onclick="openModule('FALCON_SOCIAL', true)" title="Falcon Social e Publicação">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span class="nav-label">Falcon Social e Publicação</span>
+      </button>
+      <button class="nav-btn" data-mod="FALCON_CRM" onclick="openModule('FALCON_CRM', true)" title="Falcon CRM Comercial">
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <span class="nav-label">Falcon CRM Comercial</span>
+      </button>
+      <button class="nav-btn" data-mod="FALCON_PERFORMANCE" onclick="openModule('FALCON_PERFORMANCE', true)" title="Falcon Performance e Core">
+        <svg viewBox="0 0 24 24">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span class="nav-label">Falcon Performance e Core</span>
       </button>
     </aside>
 
@@ -335,44 +626,75 @@
         <div class="hud-overlay">
           <div class="hud-pill">
             <strong>Setor Atual:</strong>
-            <span id="playerSectorLabel" style="color:#00aef5;">Recepção & Identidade</span>
+            <span id="playerSectorLabel" style="color:#00aef5;">Recepção e Identidade</span>
             <span>|</span>
             <span id="playerCoordsLabel">(5, 5)</span>
           </div>
           <div class="hud-pill">
             <span>Câmera 3D:</span>
-            <button class="btn" style="padding:4px 8px;" onclick="adjustCameraAngle(-0.2)">↺ Girar</button>
-            <button class="btn" style="padding:4px 8px;" onclick="adjustCameraAngle(0.2)">↻ Girar</button>
-            <button class="btn" style="padding:4px 8px;" onclick="adjustCameraZoom(0.15)">＋ Zoom</button>
-            <button class="btn" style="padding:4px 8px;" onclick="adjustCameraZoom(-0.15)">－ Zoom</button>
+            <button class="btn hud-btn-icon" onclick="adjustCameraAngle(-0.2)" title="Rotacionar para a esquerda">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+              <span>Girar</span>
+            </button>
+            <button class="btn hud-btn-icon" onclick="adjustCameraAngle(0.2)" title="Rotacionar para a direita">
+              <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              <span>Girar</span>
+            </button>
+            <button class="btn hud-btn-icon" onclick="adjustCameraZoom(0.15)" title="Aproximar Zoom">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Zoom</span>
+            </button>
+            <button class="btn hud-btn-icon" onclick="adjustCameraZoom(-0.15)" title="Afastar Zoom">
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Zoom</span>
+            </button>
           </div>
         </div>
 
         <div class="hud-bottom">
           <div class="hud-pill">
-            <span>Clique no piso 3D, em qualquer agente ou objeto interativo — ou use WASD / Setas para caminhar.</span>
+            <span>Clique no piso 3D, em qualquer especialista ou objeto interativo, ou utilize WASD / Setas para caminhar.</span>
           </div>
           <div class="dpad">
             <div></div>
-            <button onclick="movePlayerDelta(0, -1)">▲</button>
+            <button onclick="movePlayerDelta(0, -1)" title="Mover para o Norte">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </button>
             <div></div>
-            <button onclick="movePlayerDelta(-1, 0)">◀</button>
-            <button onclick="movePlayerDelta(0, 1)">▼</button>
-            <button onclick="movePlayerDelta(1, 0)">▶</button>
+            <button onclick="movePlayerDelta(-1, 0)" title="Mover para o Oeste">
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button onclick="movePlayerDelta(0, 1)" title="Mover para o Sul">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <button onclick="movePlayerDelta(1, 0)" title="Mover para o Leste">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- DASHBOARD TRADICIONAL COMPLETO (FALLBACK DE RESILIÊNCIA — Critério 12 do MVP) -->
+      <!-- DASHBOARD TRADICIONAL COMPLETO (FALLBACK DE RESILIÊNCIA) -->
       <div id="fallbackDashboardContainer" class="fallback-dashboard">
-        <h2 style="margin-bottom:8px;">Dashboard Operacional Tradicional (Modo Independente do 3D)</h2>
+        <h2 style="margin-bottom:8px;">Painel Operacional Executivo (Modo Independente do 3D)</h2>
         <p style="color:var(--muted);margin-bottom:16px;font-size:13px;">
-          Todas as operações da agência virtual funcionam de forma 100% independente caso o WebGL/3D esteja desativado.
+          Todas as operações da agência virtual funcionam de forma 100% independente caso a visualização 3D esteja desativada.
         </p>
         <div id="fallbackSummaryGrid" class="grid-2"></div>
       </div>
     </main>
 
+    <!-- BOTÃO FLUTUANTE NO CANTO INFERIOR DIREITO (SEM EMOJIS, ÍCONE VETORIAL PROFISSIONAL) -->
+    <button class="floating-menu-btn" id="floatingMenuBtn" onclick="toggleFloatingDrawer()" title="Abrir Central de Comando e Objetos Interativos">
+      <svg id="floatingMenuIcon" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+      </svg>
+    </button>
+
+    <!-- MENU FLUTUANTE DE COMANDO E MÓDULOS -->
     <section class="right-drawer" id="moduleDrawer">
       <div class="card">
         <h3>Inicializando Agência Virtual...</h3>
@@ -383,40 +705,40 @@
 
   <script>
     const INITIAL_ZONES = [
-      { id: 'RECEPTION_IDENTITY', label: '1. Recepção & Identidade', colStart: 1, rowStart: 1, width: 9, height: 6, accentColor: '#00aef5' },
+      { id: 'RECEPTION_IDENTITY', label: '1. Recepção e Identidade', colStart: 1, rowStart: 1, width: 9, height: 6, accentColor: '#00aef5' },
       { id: 'EXECUTIVE_COMMAND_ROOM', label: '2. Sala do Head de Marketing', colStart: 11, rowStart: 1, width: 10, height: 6, accentColor: '#2d80d5' },
-      { id: 'STRATEGY_BRAND_INTELLIGENCE', label: '3. Estratégia & Brand Intelligence', colStart: 22, rowStart: 1, width: 9, height: 6, accentColor: '#00aef5' },
-      { id: 'CONTENT_COPY_STUDIO', label: '4. Ilha de Conteúdo & Copywriting', colStart: 1, rowStart: 8, width: 9, height: 6, accentColor: '#2d80d5' },
-      { id: 'CREATIVE_DESIGN_LAB', label: '5. Estúdio Criativo & Design', colStart: 11, rowStart: 8, width: 10, height: 6, accentColor: '#00aef5' },
-      { id: 'VIDEO_SCRIPT_HUB', label: '6. Hub de Vídeo & Roteiros', colStart: 22, rowStart: 8, width: 9, height: 6, accentColor: '#2d80d5' },
-      { id: 'TRAFFIC_PERFORMANCE_CENTER', label: '7. Tráfego Pago & Performance', colStart: 1, rowStart: 15, width: 9, height: 6, accentColor: '#00aef5' },
-      { id: 'SOCIAL_CALENDAR_ROOM', label: '8. Social Media & Aprovações', colStart: 11, rowStart: 15, width: 10, height: 6, accentColor: '#2d80d5' },
-      { id: 'COMMERCIAL_CRM_WING', label: '9. Ala Comercial & CRM', colStart: 22, rowStart: 15, width: 9, height: 6, accentColor: '#00aef5' }
+      { id: 'STRATEGY_BRAND_INTELLIGENCE', label: '3. Estratégia e Brand Intelligence', colStart: 22, rowStart: 1, width: 9, height: 6, accentColor: '#00aef5' },
+      { id: 'CONTENT_COPY_STUDIO', label: '4. Ilha de Conteúdo e Copywriting', colStart: 1, rowStart: 8, width: 9, height: 6, accentColor: '#2d80d5' },
+      { id: 'CREATIVE_DESIGN_LAB', label: '5. Estúdio Criativo e Design', colStart: 11, rowStart: 8, width: 10, height: 6, accentColor: '#00aef5' },
+      { id: 'VIDEO_SCRIPT_HUB', label: '6. Hub de Vídeo e Roteiros', colStart: 22, rowStart: 8, width: 9, height: 6, accentColor: '#2d80d5' },
+      { id: 'TRAFFIC_PERFORMANCE_CENTER', label: '7. Tráfego Pago e Performance', colStart: 1, rowStart: 15, width: 9, height: 6, accentColor: '#00aef5' },
+      { id: 'SOCIAL_CALENDAR_ROOM', label: '8. Social Media e Aprovações', colStart: 11, rowStart: 15, width: 10, height: 6, accentColor: '#2d80d5' },
+      { id: 'COMMERCIAL_CRM_WING', label: '9. Ala Comercial e CRM', colStart: 22, rowStart: 15, width: 9, height: 6, accentColor: '#00aef5' }
     ];
 
     const INITIAL_AGENTS = [
-      { slug: 'head-de-marketing', name: 'Atlas (Head IA)', roleTitle: 'Head de Marketing', department: 'Comando & Orquestração', defaultSector: 'EXECUTIVE_COMMAND_ROOM', col: 15, row: 3, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'project_dag.create', 'agent.delegate', 'qa.evaluate'] },
-      { slug: 'estrategista-de-marca', name: 'Vega', roleTitle: 'Estrategista de Marca', department: 'Estratégia & Posicionamento', defaultSector: 'STRATEGY_BRAND_INTELLIGENCE', col: 25, row: 3, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'positioning.analyze'] },
-      { slug: 'estrategista-de-conteudo', name: 'Orion', roleTitle: 'Estrategista de Conteúdo', department: 'Conteúdo & Editorial', defaultSector: 'CONTENT_COPY_STUDIO', col: 3, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'editorial_matrix.plan'] },
-      { slug: 'copywriter', name: 'Lyra', roleTitle: 'Copywriter Sênior', department: 'Copywriting & Conversão', defaultSector: 'CONTENT_COPY_STUDIO', col: 7, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'copy.write', 'studio.version_create'] },
-      { slug: 'diretor-criativo', name: ' Solaris', roleTitle: 'Diretor Criativo', department: 'Direção de Arte', defaultSector: 'CREATIVE_DESIGN_LAB', col: 13, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'creative_direction.define'] },
-      { slug: 'designer-social', name: 'Prism', roleTitle: 'Designer Social', department: 'Design & Identidade Visual', defaultSector: 'CREATIVE_DESIGN_LAB', col: 18, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'visual_layout.compose', 'studio.version_create'] },
-      { slug: 'roteirista-de-video', name: 'Nova', roleTitle: 'Roteirista de Vídeo', department: 'Audiovisual & Reels', defaultSector: 'VIDEO_SCRIPT_HUB', col: 26, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'video_script.write', 'studio.version_create'] },
-      { slug: 'gestor-de-trafego', name: 'Kai', roleTitle: 'Gestor de Tráfego', department: 'Mídia Paga & Aquisição', defaultSector: 'TRAFFIC_PERFORMANCE_CENTER', col: 4, row: 17, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'paid_media.plan'] },
-      { slug: 'planejador-de-social-e-calendario', name: 'Pulse', roleTitle: 'Planejador Social', department: 'Calendário & Publicação', defaultSector: 'SOCIAL_CALENDAR_ROOM', col: 14, row: 17, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'social_calendar.schedule'] },
-      { slug: 'analista-de-crm-e-leads', name: 'Zenith', roleTitle: 'Analista de CRM', department: 'Comercial & Funil', defaultSector: 'COMMERCIAL_CRM_WING', col: 25, row: 17, operationalState: 'AVAILABLE', authorizedTools: ['crm.read_pipeline', 'crm.qualify_lead'] },
-      { slug: 'analista-de-performance-e-dados', name: 'Sterling', roleTitle: 'Analista de Performance', department: 'BI & Atribuição', defaultSector: 'TRAFFIC_PERFORMANCE_CENTER', col: 7, row: 18, operationalState: 'AVAILABLE', authorizedTools: ['analytics.read_kpis', 'roi.report'] }
+      { slug: 'head-de-marketing', name: 'Atlas (Head)', roleTitle: 'Head de Marketing', department: 'Comando e Orquestração', defaultSector: 'EXECUTIVE_COMMAND_ROOM', col: 15, row: 3, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'project_dag.create', 'agent.delegate', 'qa.evaluate'] },
+      { slug: 'estrategista-de-marca', name: 'Vega', roleTitle: 'Estrategista de Marca', department: 'Estratégia e Posicionamento', defaultSector: 'STRATEGY_BRAND_INTELLIGENCE', col: 25, row: 3, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'positioning.analyze'] },
+      { slug: 'estrategista-de-conteudo', name: 'Orion', roleTitle: 'Estrategista de Conteúdo', department: 'Conteúdo e Editorial', defaultSector: 'CONTENT_COPY_STUDIO', col: 3, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'editorial_matrix.plan'] },
+      { slug: 'copywriter', name: 'Lyra', roleTitle: 'Copywriter Sênior', department: 'Copywriting e Conversão', defaultSector: 'CONTENT_COPY_STUDIO', col: 7, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'copy.write', 'studio.version_create'] },
+      { slug: 'diretor-criativo', name: 'Solaris', roleTitle: 'Diretor Criativo', department: 'Direção de Arte', defaultSector: 'CREATIVE_DESIGN_LAB', col: 13, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'creative_direction.define'] },
+      { slug: 'designer-social', name: 'Prism', roleTitle: 'Designer Social', department: 'Design e Identidade Visual', defaultSector: 'CREATIVE_DESIGN_LAB', col: 18, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'visual_layout.compose', 'studio.version_create'] },
+      { slug: 'roteirista-de-video', name: 'Nova', roleTitle: 'Roteirista de Vídeo', department: 'Audiovisual e Reels', defaultSector: 'VIDEO_SCRIPT_HUB', col: 26, row: 10, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'video_script.write', 'studio.version_create'] },
+      { slug: 'gestor-de-trafego', name: 'Kai', roleTitle: 'Gestor de Tráfego', department: 'Mídia Paga e Aquisição', defaultSector: 'TRAFFIC_PERFORMANCE_CENTER', col: 4, row: 17, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'paid_media.plan'] },
+      { slug: 'planejador-de-social-e-calendario', name: 'Pulse', roleTitle: 'Planejador Social', department: 'Calendário e Publicação', defaultSector: 'SOCIAL_CALENDAR_ROOM', col: 14, row: 17, operationalState: 'AVAILABLE', authorizedTools: ['brand_memory.read', 'social_calendar.schedule'] },
+      { slug: 'analista-de-crm-e-leads', name: 'Zenith', roleTitle: 'Analista de CRM', department: 'Comercial e Funil', defaultSector: 'COMMERCIAL_CRM_WING', col: 25, row: 17, operationalState: 'AVAILABLE', authorizedTools: ['crm.read_pipeline', 'crm.qualify_lead'] },
+      { slug: 'analista-de-performance-e-dados', name: 'Sterling', roleTitle: 'Analista de Performance', department: 'BI e Atribuição', defaultSector: 'TRAFFIC_PERFORMANCE_CENTER', col: 7, row: 18, operationalState: 'AVAILABLE', authorizedTools: ['analytics.read_kpis', 'roi.report'] }
     ];
 
     const INITIAL_FURNITURE = [
-      // Totens Interativos conectados aos módulos reais do SaaS
-      { uid: 'totem-setup', type: 'TOTEM', col: 4, row: 3, linkedModule: 'FALCON_SETUP', customLabel: '🧭 Totem Falcon Setup' },
-      { uid: 'totem-command', type: 'COMMAND_DESK', col: 16, row: 5, linkedModule: 'FALCON_COMMAND', customLabel: '⚡ Central Falcon Command' },
-      { uid: 'totem-brand', type: 'TOTEM', col: 27, row: 4, linkedModule: 'FALCON_BRAND_INTELLIGENCE', customLabel: '🧠 Totem Brand Intelligence' },
-      { uid: 'totem-studio', type: 'WORKBENCH', col: 15, row: 12, linkedModule: 'FALCON_STUDIO', customLabel: '🎨 Bancada Falcon Studio' },
-      { uid: 'totem-approvals', type: 'APPROVAL_BOARD', col: 18, row: 17, linkedModule: 'FALCON_APPROVALS', customLabel: '✅ Painel de Aprovações' },
-      { uid: 'totem-crm', type: 'CRM_TERMINAL', col: 28, row: 18, linkedModule: 'FALCON_CRM', customLabel: '💼 Terminal Falcon CRM' },
-      { uid: 'totem-perf', type: 'PERF_BOARD', col: 2, row: 19, linkedModule: 'FALCON_PERFORMANCE', customLabel: '📈 Painel Performance' },
+      // Totens Interativos conectados aos módulos reais do SaaS (sem emojis)
+      { uid: 'totem-setup', type: 'TOTEM', col: 4, row: 3, linkedModule: 'FALCON_SETUP', customLabel: 'Totem Falcon Setup' },
+      { uid: 'totem-command', type: 'COMMAND_DESK', col: 16, row: 5, linkedModule: 'FALCON_COMMAND', customLabel: 'Central Falcon Command' },
+      { uid: 'totem-brand', type: 'TOTEM', col: 27, row: 4, linkedModule: 'FALCON_BRAND_INTELLIGENCE', customLabel: 'Totem Brand Intelligence' },
+      { uid: 'totem-studio', type: 'WORKBENCH', col: 15, row: 12, linkedModule: 'FALCON_STUDIO', customLabel: 'Bancada Falcon Studio' },
+      { uid: 'totem-approvals', type: 'APPROVAL_BOARD', col: 18, row: 17, linkedModule: 'FALCON_APPROVALS', customLabel: 'Painel de Aprovações' },
+      { uid: 'totem-crm', type: 'CRM_TERMINAL', col: 28, row: 18, linkedModule: 'FALCON_CRM', customLabel: 'Terminal Falcon CRM' },
+      { uid: 'totem-perf', type: 'PERF_BOARD', col: 2, row: 19, linkedModule: 'FALCON_PERFORMANCE', customLabel: 'Painel Performance' },
       // Estações de trabalho 3D (Mesas + Monitores) para cada um dos 11 agentes
       ...INITIAL_AGENTS.map((a, idx) => ({
         uid: `desk-${a.slug}`,
@@ -470,7 +792,7 @@
           displayName: 'Diretor Executivo',
           col: 5,
           row: 5,
-          currentSectorId: '1. Recepção & Identidade'
+          currentSectorId: '1. Recepção e Identidade'
         }
       },
       layoutHistory: [],
@@ -484,7 +806,7 @@
           id: 'bi-default-1',
           category: 'tone_of_voice',
           memoryLevel: 'PERMANENT',
-          title: 'Tom de Voz Executivo & Orientado a ROI',
+          title: 'Tom de Voz Executivo e Orientado a ROI',
           currentVersion: 1,
           status: 'ACTIVE'
         }
@@ -514,15 +836,45 @@
         estimatedAiCostUsd: 0.21
       },
       activeModule: 'FALCON_COMMAND',
+      drawerOpen: false,
+      sidebarCollapsed: false,
       fallbackMode: false,
       camera: {
         yaw: 0.68,
         pitch: 0.58,
-        zoom: 1.02,
+        zoom: 1.08,
         panX: 0,
-        panY: -25
+        panY: -20
       }
     };
+
+    function toggleSidebarCollapse() {
+      state.sidebarCollapsed = !state.sidebarCollapsed;
+      const sidebar = document.getElementById('mainSidebar');
+      if (sidebar) {
+        sidebar.classList.toggle('collapsed', state.sidebarCollapsed);
+      }
+    }
+
+    function toggleFloatingDrawer(forceState) {
+      if (typeof forceState === 'boolean') {
+        state.drawerOpen = forceState;
+      } else {
+        state.drawerOpen = !state.drawerOpen;
+      }
+      const drawer = document.getElementById('moduleDrawer');
+      if (drawer) {
+        drawer.classList.toggle('open', state.drawerOpen);
+      }
+      const icon = document.getElementById('floatingMenuIcon');
+      if (icon) {
+        if (state.drawerOpen) {
+          icon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+        } else {
+          icon.innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect>';
+        }
+      }
+    }
 
     function detectZoneLabel(col, row) {
       const zones = state.office?.layout?.zones || INITIAL_ZONES;
@@ -578,7 +930,7 @@
             slug: `agencia-falcon-${uniqueSuffix}`,
             legalName: `Falcon Growth Enterprise ${uniqueSuffix} S.A.`,
             publicName: `Agência Falcon #${uniqueSuffix}`,
-            segment: 'SaaS B2B & Performance Digital',
+            segment: 'SaaS B2B e Performance Digital',
             planTier: 'PREMIUM'
           })
         });
@@ -590,7 +942,7 @@
       } catch (err) {
         console.warn('[FALCON 3D OFFICE] Operando com motor espacial 3D ativo:', err?.message || err);
         document.getElementById('orgHeaderTitle').textContent =
-          `${state.organization.publicName} — Agência Virtual IA`;
+          `${state.organization.publicName} | Sua agência. Sua equipe. Sua inteligência.`;
         document.getElementById('dbInstanceBadge').textContent =
           `DB Isolado: ${state.tenantInstance.dbName} (${state.tenantInstance.healthStatus})`;
         updateHudPlayer();
@@ -635,7 +987,7 @@
       }
 
       document.getElementById('orgHeaderTitle').textContent =
-        `${state.organization.publicName} — Agência Virtual IA`;
+        `${state.organization.publicName} | Sua agência. Sua equipe. Sua inteligência.`;
       document.getElementById('dbInstanceBadge').textContent =
         `DB Isolado: ${state.tenantInstance?.dbName || 'falcon_tenant_hq'} (${state.tenantInstance?.healthStatus || 'HEALTHY'})`;
 
@@ -705,19 +1057,23 @@
       renderFallbackDashboard();
     }
 
-    function openModule(mod) {
+    function openModule(mod, shouldOpenDrawer = true) {
       state.activeModule = mod;
       document.querySelectorAll('.nav-btn').forEach((b) => {
         b.classList.toggle('active', b.dataset.mod === mod);
       });
       renderActiveModuleDrawer();
+      if (mod === 'VIRTUAL_OFFICE' && !shouldOpenDrawer) {
+        toggleFloatingDrawer(false);
+      } else if (shouldOpenDrawer) {
+        toggleFloatingDrawer(true);
+      }
     }
 
-    // ── RENDERIZADOR 3D VOLUMÉTRICO ISOMÉTRICO DO ESCRITÓRIO VIRTUAL ─────────
+    // RENDERIZADOR 3D VOLUMÉTRICO ISOMÉTRICO DO ESCRITÓRIO VIRTUAL
     const canvas = document.getElementById('office3dCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Suporte a arrastar câmera (pan) e zoom por scroll no canvas 3D
     let isDraggingCamera = false;
     let dragStartX = 0;
     let dragStartY = 0;
@@ -777,7 +1133,6 @@
       const t3 = projectIso3D(col + wCols, row + dRows, zTop);
       const t4 = projectIso3D(col, row + dRows, zTop);
 
-      // Face frontal esquerda
       ctx.beginPath();
       ctx.moveTo(b4.x, b4.y);
       ctx.lineTo(b3.x, b3.y);
@@ -787,7 +1142,6 @@
       ctx.fillStyle = leftColor;
       ctx.fill();
 
-      // Face frontal direita
       ctx.beginPath();
       ctx.moveTo(b2.x, b2.y);
       ctx.lineTo(b3.x, b3.y);
@@ -797,7 +1151,6 @@
       ctx.fillStyle = rightColor;
       ctx.fill();
 
-      // Topo
       ctx.beginPath();
       ctx.moveTo(t1.x, t1.y);
       ctx.lineTo(t2.x, t2.y);
@@ -824,7 +1177,8 @@
 
       if (state.office?.layout && !state.fallbackMode) {
         const layout = state.office.layout;
-        const primaryBrand = layout.branding?.primaryColor || '#00aef5';
+        const rawBrand = layout.branding?.primaryColor;
+        const primaryBrand = (!rawBrand || rawBrand === '#f59e0b') ? '#00aef5' : rawBrand;
         const pulse = Math.sin(timestamp / 380) * 2.2;
 
         // 0. Laje 3D base do andar corporativo e malha de piso isométrico (#07111c / #00aef5 / #2d80d5)
@@ -853,8 +1207,11 @@
           ctx.stroke();
         }
 
-        // 1. Renderiza os 9 setores oficiais do escritório 3D
-        for (const zone of layout.zones || INITIAL_ZONES) {
+        // 1. Renderiza os 9 setores oficiais do escritório 3D na paleta oficial
+        const zonesList = layout.zones || INITIAL_ZONES;
+        for (let zi = 0; zi < zonesList.length; zi++) {
+          const zone = zonesList[zi];
+          const zoneColor = (zi % 2 === 0) ? primaryBrand : '#2d80d5';
           const p1 = projectIso3D(zone.colStart, zone.rowStart, 0.5);
           const p2 = projectIso3D(zone.colStart + zone.width, zone.rowStart, 0.5);
           const p3 = projectIso3D(zone.colStart + zone.width, zone.rowStart + zone.height, 0.5);
@@ -866,9 +1223,9 @@
           ctx.lineTo(p3.x, p3.y);
           ctx.lineTo(p4.x, p4.y);
           ctx.closePath();
-          ctx.fillStyle = (zone.accentColor || primaryBrand) + '22';
+          ctx.fillStyle = zoneColor + '22';
           ctx.fill();
-          ctx.strokeStyle = (zone.accentColor || primaryBrand) + 'aa';
+          ctx.strokeStyle = zoneColor + 'aa';
           ctx.lineWidth = 1.8;
           ctx.stroke();
 
@@ -882,7 +1239,6 @@
         // 2. Renderiza mobiliário 3D volumétrico (estações de trabalho, monitores e totens interativos)
         for (const furn of layout.furniture || INITIAL_FURNITURE) {
           if (furn.linkedModule) {
-            // Totem / Bancada Interativa 3D com brilho na paleta #00aef5 / #2d80d5
             drawIsoPrism(
               furn.col, furn.row, 1.1, 1.1,
               0, 18,
@@ -900,7 +1256,6 @@
             ctx.textAlign = 'center';
             ctx.fillText(label, top.x, top.y);
           } else {
-            // Estação de trabalho 3D (Mesa #0b1929 + Monitor brilhante #00aef5)
             drawIsoPrism(
               furn.col, furn.row, 1.2, 0.8,
               0, 9,
@@ -914,13 +1269,13 @@
           }
         }
 
-        // 3. Renderiza os 11 Agentes Especializados da FALCON AI TEAM com estados reais
+        // 3. Renderiza os 11 Especialistas da Equipe com estados reais
         const stateColors = {
           AVAILABLE: '#10b981',
-          PLANNING: '#3b82f6',
-          EXECUTING: '#f59e0b',
-          REVIEWING: '#8b5cf6',
-          AWAITING_APPROVAL: '#eab308',
+          PLANNING: '#00aef5',
+          EXECUTING: '#2d80d5',
+          REVIEWING: '#38bdf8',
+          AWAITING_APPROVAL: '#00aef5',
           COMPLETED: '#10b981',
           ERROR: '#ef4444'
         };
@@ -934,13 +1289,11 @@
           const headPos = projectIso3D(ag.col + 0.5, ag.row + 0.5, 22 + bob);
           const color = stateColors[ag.operationalState] || '#10b981';
 
-          // Sombra no piso
           ctx.beginPath();
           ctx.ellipse(shadowPos.x, shadowPos.y, 10 * state.camera.zoom, 5 * state.camera.zoom, 0, 0, Math.PI * 2);
           ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
           ctx.fill();
 
-          // Halo se estiver executando/planejando
           if (ag.operationalState !== 'AVAILABLE') {
             ctx.beginPath();
             ctx.ellipse(shadowPos.x, shadowPos.y, (14 + pulse) * state.camera.zoom, (7 + pulse / 2) * state.camera.zoom, 0, 0, Math.PI * 2);
@@ -949,7 +1302,6 @@
             ctx.stroke();
           }
 
-          // Torso 3D do agente
           ctx.beginPath();
           ctx.roundRect(
             bodyPos.x - 7 * state.camera.zoom,
@@ -961,10 +1313,9 @@
           ctx.fillStyle = color;
           ctx.fill();
           ctx.lineWidth = 1.5;
-          ctx.strokeStyle = '#09090b';
+          ctx.strokeStyle = '#07111c';
           ctx.stroke();
 
-          // Cabeça + Visor Pixel/3D
           ctx.beginPath();
           ctx.arc(headPos.x, headPos.y, 6.5 * state.camera.zoom, 0, Math.PI * 2);
           ctx.fillStyle = '#f8fafc';
@@ -973,7 +1324,6 @@
           ctx.strokeStyle = color;
           ctx.stroke();
 
-          // Nome e estado operacional real
           ctx.fillStyle = '#ffffff';
           ctx.font = `700 ${Math.max(9, Math.round(10.5 * state.camera.zoom))}px 'Sora', sans-serif`;
           ctx.textAlign = 'center';
@@ -984,31 +1334,31 @@
           ctx.fillText(`[${ag.operationalState}]`, bodyPos.x, bodyPos.y + 18 * state.camera.zoom);
         }
 
-        // 4. Renderiza o Avatar do Usuário (Movimentação Livre — ★ VOCÊ DIRETOR)
+        // 4. Renderiza o Avatar do Usuário (Movimentação Livre)
         if (state.office.player) {
           const pShadow = projectIso3D(state.office.player.col + 0.5, state.office.player.row + 0.5, 1);
           const pPos = projectIso3D(state.office.player.col + 0.5, state.office.player.row + 0.5, 20 + pulse);
 
           ctx.beginPath();
           ctx.ellipse(pShadow.x, pShadow.y, 13 * state.camera.zoom, 6.5 * state.camera.zoom, 0, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+          ctx.fillStyle = 'rgba(0, 174, 245, 0.35)';
           ctx.fill();
-          ctx.strokeStyle = '#38bdf8';
+          ctx.strokeStyle = '#00aef5';
           ctx.lineWidth = 2;
           ctx.stroke();
 
           ctx.beginPath();
           ctx.arc(pPos.x, pPos.y, 10.5 * state.camera.zoom, 0, Math.PI * 2);
-          ctx.fillStyle = '#38bdf8';
+          ctx.fillStyle = '#00aef5';
           ctx.fill();
           ctx.lineWidth = 3;
-          ctx.strokeStyle = '#f59e0b';
+          ctx.strokeStyle = '#ffffff';
           ctx.stroke();
 
-          ctx.fillStyle = '#38bdf8';
+          ctx.fillStyle = '#00aef5';
           ctx.font = `700 ${Math.max(10, Math.round(12 * state.camera.zoom))}px 'Sora', sans-serif`;
           ctx.textAlign = 'center';
-          ctx.fillText('★ VOCÊ (DIRETOR)', pPos.x, pPos.y - 15 * state.camera.zoom);
+          ctx.fillText('VOCÊ (DIRETOR)', pPos.x, pPos.y - 15 * state.camera.zoom);
         }
       }
 
@@ -1030,7 +1380,7 @@
           state.office.player.row = Math.max(1, Math.min(20, Math.round(furn.row + 1)));
           state.office.player.currentSectorId = detectZoneLabel(state.office.player.col, state.office.player.row);
           updateHudPlayer();
-          openModule(furn.linkedModule);
+          openModule(furn.linkedModule, true);
           try {
             const res = await apiFetch('/api/office/interact', {
               method: 'POST',
@@ -1045,16 +1395,16 @@
         }
       }
 
-      // Verifica se clicou próximo a um dos 11 agentes
+      // Verifica se clicou próximo a um dos 11 especialistas
       for (const ag of state.office.agents || INITIAL_AGENTS) {
         const p = projectIso3D(ag.col + 0.5, ag.row + 0.5, 16);
         if (Math.hypot(clickX - p.x, clickY - p.y) < 26) {
-          openModule('FALCON_AI_TEAM');
+          openModule('FALCON_AI_TEAM', true);
           return;
         }
       }
 
-      // Caso contrário, encontra o tile mais próximo do clique e navega!
+      // Caso contrário, encontra o tile mais próximo do clique e navega
       let bestCol = 5;
       let bestRow = 5;
       let bestDist = Infinity;
@@ -1087,15 +1437,30 @@
       } catch {}
     });
 
-    // ── PAINEL LATERAL DINÂMICO DE MÓDULOS DO SAAS ───────────────────────────
+    // MENU FLUTUANTE DE COMANDO E MÓDULOS DO SAAS (ZERO EMOJIS, ÍCONES SVG PROFISSIONAIS)
+    function getDrawerTopBarHtml(sectionLabel) {
+      return `
+        <div class="drawer-top-bar">
+          <span class="drawer-top-title">${sectionLabel}</span>
+          <button class="drawer-close-btn" onclick="toggleFloatingDrawer(false)" title="Fechar painel">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      `;
+    }
+
     function renderActiveModuleDrawer() {
       const drawer = document.getElementById('moduleDrawer');
       const mod = state.activeModule;
 
       if (mod === 'FALCON_COMMAND' || mod === 'VIRTUAL_OFFICE') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Central de Operações')}
           <div class="card">
-            <h3>⚡ FALCON COMMAND — Solicitar Trabalho</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+              <span>FALCON COMMAND | Solicitar Trabalho</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">
               O Head de Marketing (Atlas) consulta a Brand Intelligence da sua empresa, cria o projeto e coordena os especialistas em paralelo (DAG).
             </p>
@@ -1103,11 +1468,14 @@
             <button class="btn btn-primary" onclick="submitFalconCommand()">Executar Orquestração Multi-Agente</button>
           </div>
           <div class="card">
-            <h3>🏢 Objetos Interativos no Escritório 3D</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><path d="M12 3L4 7.5v9L12 21l8-4.5v-9L12 3z"></path><path d="M12 12l8-4.5"></path><path d="M12 12v9"></path><path d="M12 12L4 7.5"></path></svg>
+              <span>Objetos Interativos no Escritório 3D</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">Clique em qualquer objeto no mapa 3D ou acione abaixo:</p>
-            <button class="btn" onclick="openModule('FALCON_APPROVALS')">Painel de Aprovações (${state.approvals.filter(a=>a.status==='PENDING').length} pendentes)</button>
-            <button class="btn" onclick="openModule('FALCON_STUDIO')">Bancada Falcon Studio (${state.deliverables.length} entregas)</button>
-            <button class="btn" onclick="openModule('FALCON_BRAND_INTELLIGENCE')">Totem Brand Intelligence (${state.brandEntries.length} memórias)</button>
+            <button class="btn" onclick="openModule('FALCON_APPROVALS', true)">Painel de Aprovações (${state.approvals.filter(a=>a.status==='PENDING').length} pendentes)</button>
+            <button class="btn" onclick="openModule('FALCON_STUDIO', true)">Bancada Falcon Studio (${state.deliverables.length} entregas)</button>
+            <button class="btn" onclick="openModule('FALCON_BRAND_INTELLIGENCE', true)">Totem Brand Intelligence (${state.brandEntries.length} memórias)</button>
           </div>
         `;
         return;
@@ -1115,10 +1483,14 @@
 
       if (mod === 'OFFICE_BUILDER') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Arquitetura do Escritório')}
           <div class="card">
-            <h3>🛠️ FALCON BUILD MODE (Office Builder)</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+              <span>FALCON BUILD MODE (Office Builder)</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">
-              Use modelos prontos de agência ou personalize livremente cores, mobília e layout sem afetar permissões de IA.
+              Utilize modelos prontos de agência ou personalize cores, mobília e layout mantendo a governança operacional.
             </p>
             <label style="font-size:12px;">Modelo de Escritório:</label>
             <select id="tplSelect">
@@ -1129,13 +1501,16 @@
             <button class="btn btn-primary" onclick="switchOfficeTemplate()">Aplicar Modelo</button>
           </div>
           <div class="card">
-            <h3>🎨 Personalização Visual da Sede</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+              <span>Personalização Visual da Sede</span>
+            </h3>
             <label style="font-size:12px;">Cor Primária da Marca:</label>
-            <input type="color" id="brandColorPicker" value="${state.office?.layout?.branding?.primaryColor || '#f59e0b'}" />
+            <input type="color" id="brandColorPicker" value="${state.office?.layout?.branding?.primaryColor || '#00aef5'}" />
             <button class="btn" onclick="saveOfficeBranding()">Salvar Identidade no Escritório</button>
             <div style="display:flex;gap:8px;margin-top:6px;">
-              <button class="btn" style="flex:1;" onclick="officeUndoRedo('undo')">↩ Desfazer (Undo)</button>
-              <button class="btn" style="flex:1;" onclick="officeUndoRedo('redo')">↪ Refazer (Redo)</button>
+              <button class="btn" style="flex:1;" onclick="officeUndoRedo('undo')">Desfazer (Undo)</button>
+              <button class="btn" style="flex:1;" onclick="officeUndoRedo('redo')">Refazer (Redo)</button>
             </div>
           </div>
         `;
@@ -1145,8 +1520,12 @@
       if (mod === 'FALCON_SETUP') {
         const steps = state.setupProgress?.steps || [];
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Configuração Inicial')}
           <div class="card">
-            <h3>🧭 FALCON SETUP (${state.setupProgress?.completedCount || 0}/11 Etapas)</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg>
+              <span>FALCON SETUP (${state.setupProgress?.completedCount || 0}/11 Etapas)</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">
               Salvamento parcial habilitado. Conclua e ative a FALCON BRAND INTELLIGENCE.
             </p>
@@ -1169,8 +1548,12 @@
 
       if (mod === 'FALCON_BRAND_INTELLIGENCE') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Memória Corporativa')}
           <div class="card">
-            <h3>🧠 FALCON BRAND INTELLIGENCE</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              <span>FALCON BRAND INTELLIGENCE</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">Memória estruturada, persistente e versionada por categoria.</p>
             <input id="biTitle" placeholder="Título (ex: Tom de Voz Oficial)" value="Tom de Voz e Vocabulário" />
             <input id="biAdjectives" placeholder="Adjetivos (separados por vírgula)" value="Estratégico, Consultivo, Orientado a ROI" />
@@ -1183,7 +1566,7 @@
                 <strong>${e.title}</strong>
                 <span class="badge badge-ok">v${e.currentVersion} (${e.memoryLevel})</span>
               </div>
-              <div style="font-size:12px;color:var(--muted);">${e.category} — Status: ${e.status}</div>
+              <div style="font-size:12px;color:var(--muted);">${e.category} | Status: ${e.status}</div>
             </div>
           `).join('')}
         `;
@@ -1192,8 +1575,12 @@
 
       if (mod === 'FALCON_AI_TEAM') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Corpo de Especialistas')}
           <div class="card">
-            <h3>🤖 FALCON AI TEAM (11 Especialistas)</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span>FALCON TEAM (11 Especialistas)</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">Estados operacionais reais sincronizados com o backend.</p>
           </div>
           ${state.agents.map((a) => `
@@ -1202,7 +1589,7 @@
                 <strong>${a.name}</strong>
                 <span class="badge ${a.operationalState === 'ERROR' ? 'badge-err' : 'badge-ok'}">${a.operationalState}</span>
               </div>
-              <div style="font-size:12px;color:var(--muted);">${a.department} — Setor: ${a.defaultSector}</div>
+              <div style="font-size:12px;color:var(--muted);">${a.department} | Setor: ${a.defaultSector}</div>
               <div style="font-size:11px;color:#cbd5e1;">Ferramentas autorizadas: ${a.authorizedTools.join(', ')}</div>
             </div>
           `).join('')}
@@ -1212,8 +1599,12 @@
 
       if (mod === 'PROJECTS_TASKS') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Grafo de Execução')}
           <div class="card">
-            <h3>📋 Projetos & Grafo de Tarefas (DAG)</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+              <span>Projetos e Grafo de Tarefas (DAG)</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">Total de projetos ativos: ${state.projects.length}</p>
           </div>
           ${state.projects.map((p) => `
@@ -1222,7 +1613,7 @@
               <div style="font-size:12px;color:var(--muted);">Status: ${p.status} | Tarefas DAG: ${p.tasks.length}</div>
               ${p.tasks.map((t) => `
                 <div style="font-size:12px;padding:4px 0;border-top:1px solid var(--border);">
-                  <strong>${t.assignedAgentSlug}</strong>: ${t.title} — <span class="badge badge-warn">${t.status}</span>
+                  <strong>${t.assignedAgentSlug}</strong>: ${t.title} | <span class="badge badge-warn">${t.status}</span>
                 </div>
               `).join('')}
             </div>
@@ -1233,8 +1624,12 @@
 
       if (mod === 'FALCON_STUDIO') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Estúdio de Produção')}
           <div class="card">
-            <h3>🎨 FALCON STUDIO — Entregáveis Versionados</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><circle cx="11" cy="11" r="2"></circle></svg>
+              <span>FALCON STUDIO | Entregáveis Versionados</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">Cada nova versão gera checksum SHA-256 e exige aprovação.</p>
           </div>
           ${state.deliverables.map((d) => `
@@ -1243,9 +1638,9 @@
                 <strong>${d.title}</strong>
                 <span class="badge badge-ok">v${d.currentVersion} (QA: ${d.qaScore}/100)</span>
               </div>
-              <pre style="font-size:11px;white-space:pre-wrap;background:#060911;padding:8px;border-radius:6px;max-height:140px;overflow:auto;">${d.versions[d.versions.length - 1]?.contentMarkdown || ''}</pre>
+              <pre style="font-size:11px;white-space:pre-wrap;background:#050c14;padding:8px;border-radius:6px;max-height:140px;overflow:auto;">${d.versions[d.versions.length - 1]?.contentMarkdown || ''}</pre>
               <button class="btn" onclick="createNewStudioVersion('${d.id}', ${d.currentVersion})">
-                + Gerar Nova Versão (v${d.currentVersion + 1})
+                Gerar Nova Versão (v${d.currentVersion + 1})
               </button>
             </div>
           `).join('')}
@@ -1255,8 +1650,12 @@
 
       if (mod === 'FALCON_APPROVALS' || mod === 'FALCON_SOCIAL') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Governança e Publicação')}
           <div class="card">
-            <h3>✅ FALCON APPROVALS & Trava de Publicação</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+              <span>FALCON APPROVALS e Trava de Publicação</span>
+            </h3>
             <p style="font-size:12px;color:var(--muted);">
               Nenhuma publicação externa ocorre sem aprovação explícita vinculada ao ID e checksum SHA-256 da versão atual.
             </p>
@@ -1280,8 +1679,12 @@
 
       if (mod === 'FALCON_CRM') {
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Gestão Comercial')}
           <div class="card">
-            <h3>💼 FALCON CRM — Pipeline Comercial</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              <span>FALCON CRM | Pipeline Comercial</span>
+            </h3>
             <input id="crmName" placeholder="Nome do Lead / Decisor" />
             <input id="crmCompany" placeholder="Empresa" />
             <input id="crmValue" type="number" placeholder="Valor Estimado (R$)" value="15000" />
@@ -1302,13 +1705,17 @@
       if (mod === 'FALCON_PERFORMANCE') {
         const p = state.performance || {};
         drawer.innerHTML = `
+          ${getDrawerTopBarHtml('Indicadores e Segurança')}
           <div class="card">
-            <h3>📈 FALCON PERFORMANCE & FALCON CORE</h3>
+            <h3>
+              <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              <span>FALCON PERFORMANCE e FALCON CORE</span>
+            </h3>
             <div>Projetos Criados: <strong>${p.projectsCount || 0}</strong></div>
             <div>Tarefas Concluídas/Em Aprovação: <strong>${p.completedTasksCount || 0}</strong></div>
             <div>Versões de Entregáveis: <strong>${p.deliverablesCount || 0}</strong></div>
             <div>Pipeline Comercial CRM: <strong>R$ ${(p.pipelineValueBRL || 0).toLocaleString('pt-BR')}</strong></div>
-            <div>Tokens de IA Consumidos: <strong>${p.aiTokensUsed || 0}</strong></div>
+            <div>Unidades de Processamento Consumidas: <strong>${p.aiTokensUsed || 0}</strong></div>
             <button class="btn btn-primary" onclick="triggerTenantBackup()">Gerar Backup Criptografado do Tenant</button>
           </div>
         `;
