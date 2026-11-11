@@ -1,0 +1,143 @@
+/**
+ * TeamProvider: optional extension on HookProvider for CLIs that support the
+ * Lead + Teammates pattern (Claude Agent Teams today; hypothetical future CLIs).
+ *
+ * Semantic-level interface: the host asks *what* (who's on this team? what
+ * metadata does this session have?) rather than *how* (what's the sidecar file
+ * path? what's the JSON field name?). Providers choose their own storage
+ * (filesystem, API, database) and expose only the queries.
+ *
+ * Providers without team support simply don't set `HookProvider.team`. No team-
+ * gated code runs for them -- no stubs, no dead branches.
+ */
+
+/** One background agent's completion notice: the agents it names, by spawn
+ *  tool id and by task (agent) id. `interim` = the agent only stopped to wait
+ *  on background work of its own and will notify again, so the notice must
+ *  not end its spawn. */
+export interface SpawnNotice {
+  toolIds: string[];
+  taskIds: string[];
+  interim: boolean;
+}
+
+export interface TeamProvider {
+  /** CLI identifier (e.g. 'claude', 'codex'). Used for logging. */
+  providerId: string;
+
+  /** Tool names that CAN spawn persistent teammates (fast-path gate only).
+   *  Claude: 'Agent'. But note: the same tool can also spawn basic subagents, so use
+   *  `isTeammateSpawnCall(toolName, toolInput)` for the authoritative decision. */
+  teammateSpawnTools: ReadonlySet<string>;
+
+  /** Tool names that spawn within-turn, ephemeral subagents tied to a parent tool call.
+   *  Claude: 'Task'. These produce negative-ID sub-agent characters in the webview. */
+  withinTurnSubagentTools: ReadonlySet<string>;
+
+  /** Authoritative predicate: does THIS SPECIFIC tool call spawn a persistent teammate?
+   *  Depends on tool input flags, not just the tool name. Without this, we can't
+   *  distinguish basic subagents from teammates when the same tool name is reused.
+   *
+   *  Claude: `Agent` tool with `run_in_background: true`. */
+  isTeammateSpawnCall(toolName: string, toolInput: Record<string, unknown>): boolean;
+
+  /** Extract a teammate's identity (name) from a raw hook event payload (pre-normalization).
+   *  Used to route TeammateIdle / TaskCompleted hooks to the specific teammate agent.
+   *  Claude: prefers `teammate_name`, with `agent_type` kept for SubagentStart compatibility. */
+  extractTeammateNameFromEvent(event: Record<string, unknown>): string | undefined;
+
+  /** Find all teammate transcripts belonging to a given lead session.
+   *  Provider chooses how to discover them (filesystem scan, API call, cache).
+   *  The returned `jsonlPath` is an opaque transcript handle the caller hands
+   *  back to adoption code; the `teammateName` identifies which team member it is.
+   *
+   *  `teamName` (when the lead's team is known) lets the provider also find
+   *  teammates that run as independent top-level sessions tagged with the team
+   *  rather than living under the lead session's own directory. Entries for such
+   *  teammates carry their own `sessionId` so the host can route their hook
+   *  events directly; entries without one share the lead's session.
+   *
+   *  Sidecar-backed entries additionally expose `toolUseId` (the lead's spawn
+   *  tool_use id), `taskId` (the CLI's own id for the spawned agent),
+   *  `description`, and `name` when the CLI records them. The host uses
+   *  toolUseId — or, for an agent revived under a later tool call, taskId — to
+   *  match background spawns (teams OFF) to the lead's live spawn tools, and `name` as the classifier: a named spawn is a Teammate, an
+   *  unnamed one is a Sub-agent (see CONTEXT.md — name is the sole distinction). */
+  discoverTeammates(
+    projectDir: string,
+    leadSessionId: string,
+    teamName?: string,
+  ): Array<{
+    jsonlPath: string;
+    teammateName: string;
+    sessionId?: string;
+    toolUseId?: string;
+    taskId?: string;
+    description?: string;
+    name?: string;
+  }>;
+
+  /** Detect a teammate spawn from a completed spawn-tool result on the LEAD's
+   *  transcript. Some CLI versions never tag the lead's own records with team
+   *  metadata; the only lead-side evidence of the team is the spawn tool's
+   *  result (Claude: `agent_id: <name>@<team>` in the Agent tool_result).
+   *  Returns the spawned teammate's identity, or null when the result is not a
+   *  teammate spawn. `resultContent` is the raw tool_result content (string or
+   *  content-block array). */
+  extractTeammateSpawnFromToolResult?(
+    toolName: string,
+    resultContent: unknown,
+  ): { teamName: string; teammateName: string } | null;
+
+  /** Detect a background agent left running by a completed tool on the LEAD's
+   *  transcript: an async spawn's launch (Claude: "Async agent launched
+   *  successfully. agentId: <id>"), or a stopped agent revived by a message
+   *  (Claude: a SendMessage result with `resumedAgentId`). The tool stays live
+   *  until the agent's completion notice. `taskId` is the CLI's id for the
+   *  agent when the result names it — completion notices and transcript names
+   *  may use it instead of the tool id. Returns null for any other result. */
+  extractBackgroundAgentFromToolResult?(
+    toolName: string,
+    resultContent: unknown,
+  ): { taskId?: string } | null;
+
+  /** The background-agent completion notices a lead's transcript record
+   *  carries (see server/src/backgroundSpawns.ts), with when the record was
+   *  written (`at`, ms) when it says; null when it carries none. Claude: an
+   *  `enqueue` queue-operation whose content holds `<task-notification>`s. */
+  readSpawnNotices?(
+    record: Record<string, unknown>,
+  ): { notices: SpawnNotice[]; at?: number } | null;
+
+  /** The tool ids whose results a lead's transcript record carries. A restart
+   *  reads them to tell whether a saved spawn launched in this transcript, so
+   *  a notice from before its launch doesn't end it. */
+  toolResultIds?(record: Record<string, unknown>): string[];
+
+  /** Whether a spawn call names a Teammate-to-be: once launched it is seated
+   *  as a Teammate, so it must not be watched as a Sub-agent before then.
+   *  Claude: a non-empty `name`, unless the call runs in the foreground. */
+  namesTeammate?(toolName: string, input: Record<string, unknown>): boolean;
+
+  /** Return team metadata for a session if it participates in a team.
+   *  Provider decides where to look (sidecar file, JSONL header, DB, etc.).
+   *  Returns null if the session is not part of a team.
+   *  agentName is undefined for the lead and set to the teammate's name for a teammate. */
+  getTeamMetadataForSession(jsonlPath: string): { teamName: string; agentName?: string } | null;
+
+  /** Extract team metadata from a transcript record (one parsed JSONL line).
+   *  In-memory counterpart to getTeamMetadataForSession; used by transcriptParser
+   *  where it already has the parsed record and shouldn't re-open the file. */
+  extractTeamMetadataFromRecord(
+    record: Record<string, unknown>,
+  ): { teamName?: string; agentName?: string } | null;
+
+  /** Get the currently-active member names of a team. Source of truth for team membership.
+   *  Returns the Set of names, or null if the team can't be read (team dissolved / no data).
+   *  Members the CLI has marked as finished (Claude: `isActive: false`) are excluded, so
+   *  completed one-shot teammates despawn via the periodic config scan.
+   *
+   *  Claude reads `~/.claude/teams/<teamName>/config.json`'s `members[].name` array.
+   *  Providers using API-driven team stores implement without a file path. */
+  getTeamMembers(teamName: string): Set<string> | null;
+}

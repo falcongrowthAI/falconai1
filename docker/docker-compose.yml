@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: falcon-growth-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: falcon_admin
+      POSTGRES_PASSWORD: falcon_core_local_dev_password
+      POSTGRES_DB: falcon_core
+    ports:
+      - '5432:5432'
+    volumes:
+      - falcon_pg_data:/var/lib/postgresql/data
+      - ./init-postgres.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U falcon_admin -d falcon_core']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: falcon-growth-redis
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - falcon_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: falcon-growth-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: falcon_minio_admin
+      MINIO_ROOT_PASSWORD: falcon_minio_secret_key
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - falcon_minio_data:/data
+
+volumes:
+  falcon_pg_data:
+  falcon_redis_data:
+  falcon_minio_data:

@@ -1,0 +1,20 @@
+{
+  "name": "falcon-growth",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FALCON GROWTH — Sua agência. Sua equipe. Sua inteligência. Plataforma SaaS de Agência Virtual Inteligente.",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "node scripts/link-workspaces.mjs && node apps/api/src/server.ts",
+    "test": "node scripts/link-workspaces.mjs && node --test packages/config/src/config.test.ts packages/security/src/security.test.ts packages/contracts/src/contracts.test.ts packages/db-tenant/src/multi-tenant.test.ts packages/ai-runtime/src/ai-runtime.test.ts packages/office-engine/src/office-engine.test.ts apps/api/src/api.test.ts",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down"
+  }
+}

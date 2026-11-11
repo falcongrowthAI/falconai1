@@ -1,0 +1,7 @@
+{
+  "name": "@falcon/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FALCON GROWTH — SaaS Web Application, 3D Virtual Office & Traditional Dashboard Fallback"
+}
