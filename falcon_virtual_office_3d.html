@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Falcon Growth - Escritório Virtual 3D</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js e OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      background: #060b14;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 0;
+    }
+    .font-brand {
+      font-family: 'Orbitron', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #060b14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    /* Etiquetas 3D Flutuantes no estilo exato do print Falcon */
+    .falcon-tag {
+      position: absolute;
+      pointer-events: auto;
+      transform: translate(-50%, -100%);
+      will-change: transform;
+      transition: transform 0.05s linear;
+    }
+    .room-header-tag {
+      position: absolute;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+    .interactive-prop-tag {
+      position: absolute;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .sidebar-item:hover {
+      color: #f8fafc;
+      background: rgba(30, 41, 59, 0.45);
+    }
+    .sidebar-item.active {
+      background: rgba(14, 116, 144, 0.22);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.12) inset;
+    }
+    .ctrl-btn {
+      background: #0b1322;
+      border: 1px solid #1e2d45;
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .ctrl-btn:hover {
+      background: #132038;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .ctrl-btn.active-mode {
+      background: rgba(14, 165, 233, 0.2);
+      border-color: #00a8ff;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body class="w-screen h-screen flex flex-col bg-[#060b14]">
+
+  <!-- ==================== 1. TOP HEADER BAR ==================== -->
+  <header class="h-14 w-full bg-[#060b14] border-b border-[#142033] px-5 flex items-center justify-between shrink-0 z-30">
+    <!-- Logo Falcon Growth Idêntica ao Anexo -->
+    <div class="flex items-center gap-3 cursor-pointer" onclick="resetDefaultCamera()">
+      <svg class="w-10 h-8 drop-shadow-[0_0_8px_rgba(0,168,255,0.45)]" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="falconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="50%" stop-color="#00a8ff" />
+            <stop offset="100%" stop-color="#0284c7" />
+          </linearGradient>
+        </defs>
+        <!-- Asa Superior + Cabeça e Bico do Falcão -->
+        <path d="M6 8 L112 32 L138 48 L150 68 C150 68 148 86 138 92 C136 80 128 73 114 75 L90 86 L62 104 L74 85 L102 64 L96 46 L52 29 L98 42 L114 55 L130 53 L105 36 L26 24 Z" fill="url(#falconGrad)"/>
+        <!-- Lâmina Asa Média -->
+        <path d="M18 32 L92 54 L85 68 L36 52 Z" fill="url(#falconGrad)"/>
+        <!-- Lâmina Asa Inferior -->
+        <path d="M30 58 L80 74 L60 96 L42 74 Z" fill="url(#falconGrad)"/>
+        <!-- Olho Geométrico -->
+        <polygon points="108,42 128,50 115,53" fill="#060b14"/>
+      </svg>
+      <div class="flex flex-col">
+        <div class="font-brand font-black text-base tracking-[0.14em] text-white leading-none flex items-center">
+          <span>F</span>
+          <span class="text-[#00a8ff] mx-0.5">▲</span>
+          <span>LCON</span>
+        </div>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="h-[1px] w-3 bg-[#00a8ff]/60"></span>
+          <span class="text-[8.5px] font-bold tracking-[0.38em] text-[#00a8ff] uppercase">GROWTH</span>
+          <span class="h-[1px] w-3 bg-[#00a8ff]/60"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões da Direita (+ Nova Demanda) -->
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleTopView()" title="Alternar Grade 2D/3D" class="w-9 h-9 rounded-lg bg-[#0d1626] border border-[#1c2c44] hover:border-[#00a8ff] text-slate-300 hover:text-white flex items-center justify-center transition">
+        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+      </button>
+      <button onclick="openNewDemandModal()" class="bg-[#0099ff] hover:bg-[#00adef] text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-[0_0_20px_rgba(0,153,255,0.45)] flex items-center gap-2 transition active:scale-95">
+        <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+        <span>Nova Demanda</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== 2. CORPO PRINCIPAL (SIDEBAR + VIEWPORT 3D) ==================== -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- MENU LATERAL ESQUERDO IDÊNTICO AO ANEXO -->
+    <aside id="left-sidebar" class="w-60 bg-[#060b14] border-r border-[#142033] flex flex-col justify-between py-3 px-3 shrink-0 z-20 select-none overflow-y-auto transition-all duration-200">
+      <div class="space-y-4">
+        <!-- Botão Recolher Menu -->
+        <button onclick="toggleSidebar()" class="w-full bg-[#0b1322] hover:bg-[#111d33] border border-[#19283f] rounded-lg py-2 px-3 flex items-center justify-between text-[11px] font-semibold tracking-wider text-slate-300 uppercase transition">
+          <span>RECOLHER MENU</span>
+          <i data-lucide="chevrons-left" class="w-3.5 h-3.5 text-slate-400"></i>
+        </button>
+
+        <!-- Seção 1: EXPERIÊNCIA CENTRAL -->
+        <div>
+          <div class="px-2 mb-1.5 text-[10px] font-bold tracking-wider text-slate-500 uppercase">EXPERIÊNCIA CENTRAL</div>
+          <nav class="space-y-1">
+            <div id="nav-3d" onclick="switchNav('nav-3d', false)" class="sidebar-item active">
+              <i data-lucide="box" class="w-4 h-4 text-[#38bdf8]"></i>
+              <span>Escritório Virtual 3D</span>
+            </div>
+            <div id="nav-builder" onclick="switchNav('nav-builder', true)" class="sidebar-item">
+              <i data-lucide="layout-template" class="w-4 h-4"></i>
+              <span>Office Builder (Construção)</span>
+            </div>
+          </nav>
+        </div>
+
+        <!-- Seção 2: INTELIGÊNCIA E EQUIPE -->
+        <div>
+          <div class="px-2 mb-1.5 text-[10px] font-bold tracking-wider text-slate-500 uppercase">INTELIGÊNCIA E EQUIPE</div>
+          <nav class="space-y-0.5">
+            <div onclick="showToast('Abrindo Falcon Command & WhatsApp Bridge...')" class="sidebar-item">
+              <i data-lucide="terminal" class="w-4 h-4"></i>
+              <span>Falcon Command e WhatsApp</span>
+            </div>
+            <div onclick="showToast('Falcon Setup: 11 Etapas Configuradas')" class="sidebar-item">
+              <i data-lucide="sliders" class="w-4 h-4"></i>
+              <span>Falcon Setup (11 Etapas)</span>
+            </div>
+            <div onclick="focusSectorById(3)" class="sidebar-item">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+              <span>Brand Intelligence</span>
+            </div>
+            <div onclick="showToast('11 Especialistas Ativos no Escritório 3D')" class="sidebar-item">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <span>Equipe de 11 Especialistas</span>
+            </div>
+          </nav>
+        </div>
+
+        <!-- Seção 3: OPERAÇÃO E ENTREGAS -->
+        <div>
+          <div class="px-2 mb-1.5 text-[10px] font-bold tracking-wider text-slate-500 uppercase">OPERAÇÃO E ENTREGAS</div>
+          <nav class="space-y-0.5">
+            <div onclick="showToast('Visualizando Grafo de Tarefas (DAG)...')" class="sidebar-item">
+              <i data-lucide="git-branch" class="w-4 h-4"></i>
+              <span>Projetos e Tarefas (DAG)</span>
+            </div>
+            <div onclick="focusSectorById(5)" class="sidebar-item">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Falcon Studio (Versões)</span>
+            </div>
+            <div onclick="focusSectorById(8)" class="sidebar-item">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Falcon Approvals (Trava)</span>
+            </div>
+            <div onclick="focusSectorById(8)" class="sidebar-item">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              <span>Falcon Social e Publicação</span>
+            </div>
+            <div onclick="focusSectorById(9)" class="sidebar-item">
+              <i data-lucide="briefcase" class="w-4 h-4"></i>
+              <span>Falcon CRM Comercial</span>
+            </div>
+            <div onclick="focusSectorById(7)" class="sidebar-item">
+              <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+              <span>Falcon Performance e Core</span>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DO ESCRITÓRIO 3D -->
+    <main class="flex-1 relative bg-[#070d18] overflow-hidden flex flex-col">
+
+      <!-- SUB-HEADER FLUTUANTE ACIMA DO 3D (Setor Atual + Controles The Sims) -->
+      <div class="w-full px-5 pt-3.5 pb-2 flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-none">
+        <!-- Pill Esquerda: Setor Atual -->
+        <div class="bg-[#0b1322]/95 border border-[#1a2942] rounded-xl px-4 py-2 flex items-center gap-2 text-xs shadow-lg pointer-events-auto backdrop-blur-md">
+          <span class="text-slate-400 font-medium">Setor Atual:</span>
+          <span id="current-sector-name" class="text-[#38bdf8] font-semibold">6. Hub de Vídeo e Roteiros</span>
+          <span class="text-slate-600">|</span>
+          <span id="current-coords" class="font-mono text-slate-300 text-[11px]">(30, 11)</span>
+        </div>
+
+        <!-- Pill Direita: Mobiliar (The Sims) + Câmera -->
+        <div class="bg-[#0b1322]/95 border border-[#1a2942] rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-lg pointer-events-auto backdrop-blur-md">
+          <button id="btn-sims-mode" onclick="toggleSimsBuilderMode()" class="ctrl-btn">
+            <i data-lucide="layout" class="w-3.5 h-3.5 text-[#38bdf8]"></i>
+            <span>Mobiliar (The Sims)</span>
+          </button>
+
+          <div class="h-4 w-[1px] bg-[#1e2d45] mx-1"></div>
+
+          <span class="text-[11px] text-slate-400 font-medium mr-0.5">Câmera:</span>
+
+          <button onclick="rotateOffice(-1)" class="ctrl-btn">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Girar</span>
+          </button>
+          <button onclick="rotateOffice(1)" class="ctrl-btn">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+            <span>Girar</span>
+          </button>
+          <button onclick="zoomCamera(-6)" class="ctrl-btn">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Zoom</span>
+          </button>
+          <button onclick="zoomCamera(6)" class="ctrl-btn">
+            <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+            <span>Zoom</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTAINER THREE.JS -->
+      <div id="canvas-container" class="flex-1 w-full h-full relative cursor-grab active:cursor-grabbing"></div>
+
+      <!-- CAMADA DE TAGS E CRACHÁS HTML 3D -->
+      <div id="labels-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
+
+      <!-- RODAPÉ ESQUERDO: INSTRUÇÃO DE CAMINHADA -->
+      <div class="absolute bottom-5 left-5 z-20 pointer-events-none">
+        <div class="bg-[#0b1322]/90 border border-[#1a2942] rounded-xl px-4 py-2.5 text-xs text-slate-300 shadow-xl backdrop-blur-md">
+          Clique no piso 3D, em qualquer especialista ou objeto interativo, ou utilize <span class="text-white font-semibold">WASD / Setas</span> para caminhar.
+        </div>
+      </div>
+
+      <!-- RODAPÉ DIREITO: D-PAD + BOTÃO AZUL QUADRADO IDÊNTICO AO ANEXO -->
+      <div class="absolute bottom-5 right-5 z-20 flex items-end gap-3">
+        <!-- D-Pad Container -->
+        <div class="bg-[#09101d]/95 border border-[#1a2942] p-2 rounded-2xl flex flex-col items-center gap-1.5 shadow-2xl backdrop-blur-md">
+          <button onmousedown="startKeyMove('KeyW')" onmouseup="stopKeyMove('KeyW')" ontouchstart="startKeyMove('KeyW')" ontouchend="stopKeyMove('KeyW')" class="w-9 h-8 rounded-lg bg-[#111c30] hover:bg-[#1a2b47] active:bg-[#00a8ff] text-slate-300 hover:text-white flex items-center justify-center border border-[#223452] transition">
+            <i data-lucide="chevron-up" class="w-4 h-4"></i>
+          </button>
+          <div class="flex items-center gap-1.5">
+            <button onmousedown="startKeyMove('KeyA')" onmouseup="stopKeyMove('KeyA')" ontouchstart="startKeyMove('KeyA')" ontouchend="stopKeyMove('KeyA')" class="w-9 h-8 rounded-lg bg-[#111c30] hover:bg-[#1a2b47] active:bg-[#00a8ff] text-slate-300 hover:text-white flex items-center justify-center border border-[#223452] transition">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button onmousedown="startKeyMove('KeyS')" onmouseup="stopKeyMove('KeyS')" ontouchstart="startKeyMove('KeyS')" ontouchend="stopKeyMove('KeyS')" class="w-9 h-8 rounded-lg bg-[#111c30] hover:bg-[#1a2b47] active:bg-[#00a8ff] text-slate-300 hover:text-white flex items-center justify-center border border-[#223452] transition">
+              <i data-lucide="chevron-down" class="w-4 h-4"></i>
+            </button>
+            <button onmousedown="startKeyMove('KeyD')" onmouseup="stopKeyMove('KeyD')" ontouchstart="startKeyMove('KeyD')" ontouchend="stopKeyMove('KeyD')" class="w-9 h-8 rounded-lg bg-[#111c30] hover:bg-[#1a2b47] active:bg-[#00a8ff] text-slate-300 hover:text-white flex items-center justify-center border border-[#223452] transition">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botão Azul de Ação Rápida / Visão Geral -->
+        <button onclick="resetDefaultCamera()" title="Centralizar Visão do Escritório" class="w-12 h-12 rounded-2xl bg-[#0099ff] hover:bg-[#00adef] text-white flex items-center justify-center shadow-[0_0_25px_rgba(0,153,255,0.5)] transition active:scale-95">
+          <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- GAVETA LATERAL DE INSPEÇÃO DE AGENTE / MODO THE SIMS -->
+      <aside id="agent-drawer" class="absolute top-16 right-5 bottom-24 w-80 bg-[#09111f]/95 backdrop-blur-xl border border-[#00a8ff]/40 rounded-2xl shadow-2xl p-4 flex flex-col justify-between z-30 transition-all duration-300 translate-x-[120%] pointer-events-auto">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-[#19283f]">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-[#00a8ff]/15 border border-[#00a8ff]/40 flex items-center justify-center text-[#38bdf8]">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 id="drawer-agent-name" class="font-bold text-white text-sm leading-tight">Nova</h3>
+                <p id="drawer-agent-role" class="text-[11px] text-[#38bdf8] font-mono">Roteirista de Vídeo</p>
+              </div>
+            </div>
+            <button onclick="closeDrawer()" class="w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="mt-3 p-2.5 rounded-xl bg-[#060b14] border border-[#162338] flex items-center justify-between text-xs">
+            <span class="text-slate-400">Setor:</span>
+            <span id="drawer-sector" class="font-semibold text-sky-300">6. Hub de Vídeo e Roteiros</span>
+          </div>
+
+          <div class="mt-2.5 p-2.5 rounded-xl bg-[#060b14] border border-[#162338] space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Status IA:</span>
+              <span id="drawer-status" class="text-emerald-400 font-medium flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Ativo no Terminal Falcon
+              </span>
+            </div>
+            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-[#00a8ff] to-emerald-400 h-full w-[92%]"></div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label class="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">Tarefa em Execução:</label>
+            <div id="drawer-task" class="p-2.5 rounded-xl bg-[#060b14] border border-[#162338] text-xs text-slate-300 font-mono leading-relaxed">
+              "Gerando roteiros de alta retenção e decupagem de cenas para campanhas Falcon Growth."
+            </div>
+          </div>
+
+          <!-- Comando Rápido -->
+          <div class="mt-3">
+            <label class="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">Enviar Comando ao Especialista:</label>
+            <div class="flex gap-1.5">
+              <input id="agent-chat-input" type="text" placeholder="Digite uma instrução..." class="w-full bg-[#060b14] border border-[#1c2c44] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#00a8ff]">
+              <button onclick="sendAgentMessage()" class="px-3 bg-[#0099ff] hover:bg-[#00adef] text-white rounded-lg text-xs font-semibold flex items-center justify-center transition">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles Mobiliar (The Sims) -->
+        <div class="pt-3 border-t border-[#19283f] space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-mono uppercase">Modo Construtor (The Sims)</span>
+            <button onclick="spawnNewDesk()" class="text-[10px] text-[#38bdf8] hover:underline font-medium">+ Nova Mesa</button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="moveSelectedDesk()" class="py-2 rounded-lg bg-[#111c30] hover:bg-[#192945] border border-[#223554] text-slate-200 text-xs font-medium flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-[#38bdf8]"></i>
+              <span>Girar 90°</span>
+            </button>
+            <button onclick="deleteSelectedDesk()" class="py-2 rounded-lg bg-rose-950/50 hover:bg-rose-900/70 border border-rose-800/50 text-rose-300 text-xs font-medium flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Excluir</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- TOAST DE FEEDBACK -->
+      <div id="toast" class="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-[#0b1322]/95 border border-[#00a8ff]/60 text-sky-300 text-xs px-4 py-2 rounded-xl shadow-2xl backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+        <i data-lucide="sparkles" class="w-4 h-4 text-[#00a8ff]"></i>
+        <span id="toast-text">Comando executado!</span>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==================== 3. ENGINE 3D (THREE.JS) ==================== -->
+  <script>
+    // =========================================================================
+    // 1. DADOS EXATOS DAS 9 SALAS E DOS 11 ESPECIALISTAS (CONFORME IMAGEM)
+    // =========================================================================
+    const ROOM_SIZE = 14;
+    const WALL_GAP = 0.4;
+
+    const SECTORS_CONFIG = [
+      {
+        id: 1,
+        name: "1. Recepção e Identidade",
+        grid: [-1, -1],
+        coordsLabel: "(10, 08)",
+        agents: [],
+        props: [
+          { label: "Totem Falcon Setup", offset: [-1.5, -1.2], type: "totem" }
+        ]
+      },
+      {
+        id: 2,
+        name: "2. Sala do Head de Marketing",
+        grid: [0, -1],
+        coordsLabel: "(20, 08)",
+        agents: [
+          { name: "Atlas (Head)", role: "Head de Marketing", offset: [0, -1.2], shirtColor: 0x0284c7, task: "Coordenando os 11 especialistas e validando metas de Growth." }
+        ],
+        props: [
+          { label: "Central Falcon Command", offset: [1.5, 2.2], type: "terminal" }
+        ]
+      },
+      {
+        id: 3,
+        name: "3. Estratégia e Brand Intelligence",
+        grid: [1, -1],
+        coordsLabel: "(30, 08)",
+        agents: [
+          { name: "Vega", role: "Estrategista de Marca", offset: [-0.8, -1.0], shirtColor: 0x0ea5e9, task: "Analisando posicionamento competitivo e arquétipos da marca." }
+        ],
+        props: [
+          { label: "Totem Brand Intelligence", offset: [2.2, 1.5], type: "totem" }
+        ]
+      },
+      {
+        id: 4,
+        name: "4. Ilha de Conteúdo e Copywriting",
+        grid: [-1, 0],
+        coordsLabel: "(10, 11)",
+        agents: [
+          { name: "Orion", role: "Estrategista de Conteúdo", offset: [-3.1, 0.2], shirtColor: 0x0284c7, task: "Planejando linha editorial e funil de conteúdo magnético." },
+          { name: "Lyra", role: "Copywriter Sênior", offset: [2.2, 0.2], shirtColor: 0x2563eb, task: "Escrevendo headlines e cartas de vendas de alta conversão." }
+        ],
+        props: []
+      },
+      {
+        id: 5,
+        name: "5. Estúdio Criativo e Design",
+        grid: [0, 0],
+        coordsLabel: "(20, 11)",
+        agents: [
+          { name: "Solaris", role: "Diretor Criativo", offset: [-2.8, -0.3], shirtColor: 0x4f46e5, task: "Dirigindo conceitos visuais e identidade de campanhas." },
+          { name: "Prism", role: "Designer Social", offset: [2.4, -0.3], shirtColor: 0x0891b2, task: "Desenvolvendo criativos estáticos e carrosséis no Falcon Studio." }
+        ],
+        props: [
+          { label: "Bancada Falcon Studio", offset: [0, 2.8], type: "terminal" }
+        ]
+      },
+      {
+        id: 6,
+        name: "6. Hub de Vídeo e Roteiros",
+        grid: [1, 0],
+        coordsLabel: "(30, 11)",
+        agents: [
+          { name: "Nova", role: "Roteirista de Vídeo", offset: [-0.5, -0.2], shirtColor: 0x059669, task: "Roteirizando Reels, VSLs e anúncios em vídeo com ganchos virais." }
+        ],
+        props: []
+      },
+      {
+        id: 7,
+        name: "7. Tráfego Pago e Performance",
+        grid: [-1, 1],
+        coordsLabel: "(10, 18)",
+        agents: [
+          { name: "Kal", role: "Gestor de Tráfego", offset: [-1.8, -0.6], shirtColor: 0x0284c7, task: "Otimizando campanhas Meta Ads e Google Ads para escala." },
+          { name: "Sterling", role: "Analista de Performance", offset: [2.0, 1.4], shirtColor: 0x1d4ed8, task: "Auditando métricas de CPA, CTR e ROAS em tempo real." }
+        ],
+        props: [
+          { label: "Painel Performance", offset: [-3.2, 3.2], type: "totem" }
+        ]
+      },
+      {
+        id: 8,
+        name: "8. Social Media e Aprovações",
+        grid: [0, 1],
+        coordsLabel: "(20, 18)",
+        agents: [
+          { name: "Pulse", role: "Planejador Social", offset: [-1.2, 0.2], shirtColor: 0x7c3aed, task: "Programando publicações e gerenciando calendário de postagens." }
+        ],
+        props: [
+          { label: "Painel de Aprovações", offset: [2.8, 0.8], type: "terminal" }
+        ]
+      },
+      {
+        id: 9,
+        name: "9. Ala Comercial e CRM",
+        grid: [1, 1],
+        coordsLabel: "(30, 18)",
+        agents: [
+          { name: "Zenith", role: "Analista de CRM", offset: [-1.4, -0.2], shirtColor: 0x0d9488, task: "Gerenciando pipeline comercial, leads e automações de follow-up." }
+        ],
+        props: [
+          { label: "Terminal Falcon CRM", offset: [2.5, 1.8], type: "terminal" }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 2. GERADOR DE TEXTURAS PROCEDURAIS:
+    //    - Textura da Tela do Monitor com a Logo FALCON GROWTH
+    //    - Textura e Geometria 3D do Emblema de Falcão Cristalino Azul
+    // =========================================================================
+    let falconMonitorTexture = null;
+    let falconCrystalTexture = null;
+    let falconExtrudeGeometry = null;
+
+    function createFalconBrandingAssets() {
+      // -----------------------------------------------------------------------
+      // A) TEXTURA DO MONITOR DE COMPUTADOR (Logo Falcon Growth em todos os PCs)
+      // -----------------------------------------------------------------------
+      const screenCanvas = document.createElement("canvas");
+      screenCanvas.width = 512;
+      screenCanvas.height = 256;
+      const ctx = screenCanvas.getContext("2d");
+
+      // Fundo escuro tecnológico do monitor
+      const bgGrad = ctx.createRadialGradient(256, 128, 20, 256, 128, 280);
+      bgGrad.addColorStop(0, "#091930");
+      bgGrad.addColorStop(1, "#030811");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 512, 256);
+
+      // Grade sutil ao fundo da tela
+      ctx.strokeStyle = "rgba(0, 168, 255, 0.08)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 512; x += 32) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 256); ctx.stroke();
+      }
+      for (let y = 0; y < 256; y += 32) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+      }
+
+      // Borda neon interna da tela
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.45)";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(8, 8, 496, 240);
+
+      // Desenhar o Ícone do Falcão Azul à Esquerda da Tela (LOGO-FALCON-2.png)
+      ctx.save();
+      ctx.translate(48, 42);
+      ctx.scale(1.15, 1.15);
+
+      const wingGrad = ctx.createLinearGradient(0, 0, 150, 120);
+      wingGrad.addColorStop(0, "#38bdf8");
+      wingGrad.addColorStop(0.5, "#00a8ff");
+      wingGrad.addColorStop(1, "#0284c7");
+      ctx.fillStyle = wingGrad;
+      ctx.shadowColor = "#00a8ff";
+      ctx.shadowBlur = 15;
+
+      // Asa Superior + Cabeça e Bico
+      ctx.beginPath();
+      ctx.moveTo(5, 8);
+      ctx.lineTo(110, 32);
+      ctx.lineTo(136, 48);
+      ctx.lineTo(148, 68);
+      ctx.quadraticCurveTo(146, 84, 136, 90);
+      ctx.quadraticCurveTo(132, 74, 112, 74);
+      ctx.lineTo(88, 86);
+      ctx.lineTo(60, 102);
+      ctx.lineTo(72, 84);
+      ctx.lineTo(100, 64);
+      ctx.lineTo(94, 46);
+      ctx.lineTo(50, 29);
+      ctx.lineTo(96, 42);
+      ctx.lineTo(112, 54);
+      ctx.lineTo(128, 52);
+      ctx.lineTo(104, 36);
+      ctx.lineTo(24, 24);
+      ctx.closePath();
+      ctx.fill();
+
+      // Lâmina Média da Asa
+      ctx.beginPath();
+      ctx.moveTo(16, 34);
+      ctx.lineTo(90, 55);
+      ctx.lineTo(83, 69);
+      ctx.lineTo(34, 53);
+      ctx.closePath();
+      ctx.fill();
+
+      // Lâmina Inferior da Asa
+      ctx.beginPath();
+      ctx.moveTo(28, 60);
+      ctx.lineTo(78, 75);
+      ctx.lineTo(58, 96);
+      ctx.lineTo(40, 74);
+      ctx.closePath();
+      ctx.fill();
+
+      // Recorte do Olho
+      ctx.fillStyle = "#040c18";
+      ctx.beginPath();
+      ctx.moveTo(106, 42);
+      ctx.lineTo(126, 49);
+      ctx.lineTo(113, 52);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Texto "FALCON" em Branco Bold + Delta Azul no 'A'
+      ctx.save();
+      ctx.font = "900 44px 'Orbitron', 'Inter', sans-serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(0, 168, 255, 0.5)";
+      ctx.shadowBlur = 10;
+      ctx.fillText("F", 232, 128);
+
+      // Letra A Estilizada como Triângulo Azul + Topo Branco
+      ctx.fillStyle = "#0099ff";
+      ctx.beginPath();
+      ctx.moveTo(268, 128);
+      ctx.lineTo(284, 96);
+      ctx.lineTo(300, 128);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("LCON", 306, 128);
+
+      // Subtítulo "G R O W T H" em Azul Ciano
+      ctx.font = "700 18px 'Inter', sans-serif";
+      ctx.fillStyle = "#00a8ff";
+      ctx.fillText("G   R   O   W   T   H", 236, 162);
+      ctx.restore();
+
+      falconMonitorTexture = new THREE.CanvasTexture(screenCanvas);
+      falconMonitorTexture.needsUpdate = true;
+
+      // -----------------------------------------------------------------------
+      // B) EMBLEMA DE FALCÃO CRISTALINO AZUL 3D (Substitui o diamante verde)
+      // -----------------------------------------------------------------------
+      // 1. Criar Shape 2D do Falcão para Extrusão 3D Facetada (Cristal)
+      const fShape = new THREE.Shape();
+      // Coordenadas normalizadas em torno de (0,0) reproduzindo a silhueta da cabeça + 3 lâminas de asa do Falcão
+      fShape.moveTo(-1.1, 0.75);
+      fShape.lineTo(0.35, 0.38);
+      fShape.lineTo(0.82, 0.12);
+      fShape.lineTo(1.05, -0.22); // Ponta do bico curvado
+      fShape.lineTo(0.92, -0.58); // Ponta inferior do bico
+      fShape.lineTo(0.75, -0.35);
+      fShape.lineTo(0.45, -0.32); // Queixo
+      fShape.lineTo(-0.18, -0.85); // Ponta inferior pescoço
+      fShape.lineTo(0.08, -0.42);
+      fShape.lineTo(-0.35, -0.78); // Lâmina 3 inferior
+      fShape.lineTo(-0.72, -0.32);
+      fShape.lineTo(-0.22, -0.25);
+      fShape.lineTo(-0.88, -0.05); // Lâmina 2 média
+      fShape.lineTo(-0.45, 0.22);
+      fShape.lineTo(-1.1, 0.75);  // Volta para ponta da asa superior
+
+      const extrudeSettings = {
+        steps: 1,
+        depth: 0.22,
+        bevelEnabled: true,
+        bevelThickness: 0.09,
+        bevelSize: 0.07,
+        bevelOffset: 0,
+        bevelSegments: 2
+      };
+      falconExtrudeGeometry = new THREE.ExtrudeGeometry(fShape, extrudeSettings);
+      falconExtrudeGeometry.center();
+
+      // 2. Criar também textura de facetas cristalinas de alto brilho para as faces
+      const crysCanvas = document.createElement("canvas");
+      crysCanvas.width = 256;
+      crysCanvas.height = 256;
+      const cCtx = crysCanvas.getContext("2d");
+      const cGrad = cCtx.createLinearGradient(0, 0, 256, 256);
+      cGrad.addColorStop(0, "#7dd3fc");
+      cGrad.addColorStop(0.35, "#00a8ff");
+      cGrad.addColorStop(0.7, "#0284c7");
+      cGrad.addColorStop(1, "#1e3a8a");
+      cCtx.fillStyle = cGrad;
+      cCtx.fillRect(0, 0, 256, 256);
+
+      // Triângulos de reflexo cristalino
+      cCtx.fillStyle = "rgba(255,255,255,0.35)";
+      cCtx.beginPath(); cCtx.moveTo(0, 0); cCtx.lineTo(128, 60); cCtx.lineTo(40, 140); cCtx.closePath(); cCtx.fill();
+      cCtx.beginPath(); cCtx.moveTo(140, 80); cCtx.lineTo(256, 110); cCtx.lineTo(180, 210); cCtx.closePath(); cCtx.fill();
+      falconCrystalTexture = new THREE.CanvasTexture(crysCanvas);
+    }
+
+    // Cria uma instância do Emblema 3D de Falcão Cristalino Azul para flutuar sobre o agente
+    function createCrystallineFalconEmblem(isDirector = false) {
+      const emblemGroup = new THREE.Group();
+
+      // Material Cristalino Azul Safira / Ciano Brilhante
+      const crystalMat = new THREE.MeshPhysicalMaterial({
+        color: isDirector ? 0x38bdf8 : 0x00a8ff,
+        emissive: isDirector ? 0x0284c7 : 0x0055aa,
+        emissiveIntensity: 0.65,
+        map: falconCrystalTexture,
+        metalness: 0.35,
+        roughness: 0.12,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.08,
+        reflectivity: 1.0
+      });
+
+      const falconMesh = new THREE.Mesh(falconExtrudeGeometry, crystalMat);
+      falconMesh.scale.set(0.58, 0.58, 0.58);
+      falconMesh.castShadow = true;
+      emblemGroup.add(falconMesh);
+
+      // Arestas facetadas brilhantes (efeito lapidado de cristal)
+      const edgesGeo = new THREE.EdgesGeometry(falconExtrudeGeometry, 15);
+      const edgesMat = new THREE.LineBasicMaterial({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.85
+      });
+      const edgesLine = new THREE.LineSegments(edgesGeo, edgesMat);
+      edgesLine.scale.set(0.585, 0.585, 0.585);
+      emblemGroup.add(edgesLine);
+
+      return emblemGroup;
+    }
+
+    // =========================================================================
+    // 3. INICIALIZAÇÃO DA CENA THREE.JS
+    // =========================================================================
+    let scene, camera, renderer, controls;
+    const container = document.getElementById("canvas-container");
+    const labelsContainer = document.getElementById("labels-container");
+
+    const interactiveWorkstations = [];
+    const spinningFalconEmblems = [];
+    const registeredHtmlTags = [];
+    let selectedWorkstation = null;
+    let simsBuilderMode = false;
+
+    // Avatar do Diretor (VOCÊ)
+    let directorAvatar = null;
+    const moveState = { forward: false, backward: false, left: false, right: false };
+    const directorSpeed = 0.18;
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function init() {
+      // Gerar texturas e geometrias da marca Falcon
+      createFalconBrandingAssets();
+
+      // 1. Cena
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x060b14);
+      scene.fog = new THREE.FogExp2(0x060b14, 0.0085);
+
+      // 2. Câmera (Ângulo de Visão Geral 3D idêntico ao enquadramento do print)
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      camera = new THREE.PerspectiveCamera(36, width / height, 0.5, 1000);
+      camera.position.set(0, 46, 38);
+
+      // 3. Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      // 4. OrbitControls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.07;
+      controls.maxPolarAngle = Math.PI / 2.08;
+      controls.minDistance = 8;
+      controls.maxDistance = 95;
+      controls.target.set(0, 0, 1.5);
+
+      // 5. Luzes
+      setupLights();
+
+      // 6. Construir o Escritório 3x3 Completo
+      buildFalconOffice3D();
+
+      // 7. Criar VOCÊ (DIRETOR) no Setor 6 (Hub de Vídeo e Roteiros) como no print
+      createDirectorAvatar();
+
+      // 8. Eventos
+      window.addEventListener("resize", onWindowResize);
+      renderer.domElement.addEventListener("click", onCanvasClick);
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+
+      lucide.createIcons();
+      animate();
+    }
+
+    function setupLights() {
+      const ambientLight = new THREE.AmbientLight(0x1e3a5f, 1.55);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xe0f2fe, 1.35);
+      mainLight.position.set(22, 50, 30);
+      mainLight.castShadow = true;
+      mainLight.shadow.mapSize.width = 2048;
+      mainLight.shadow.mapSize.height = 2048;
+      const d = 32;
+      mainLight.shadow.camera.left = -d;
+      mainLight.shadow.camera.right = d;
+      mainLight.shadow.camera.top = d;
+      mainLight.shadow.camera.bottom = -d;
+      mainLight.shadow.bias = -0.0005;
+      scene.add(mainLight);
+
+      const rimLight = new THREE.DirectionalLight(0x00a8ff, 0.55);
+      rimLight.position.set(-25, 20, -20);
+      scene.add(rimLight);
+    }
+
+    // =========================================================================
+    // 4. CONSTRUÇÃO DO ESCRITÓRIO 3x3 (PISOS, MOLDURA AZUL NEON, SALAS, MÓVEIS)
+    // =========================================================================
+    function buildFalconOffice3D() {
+      const totalSpan = ROOM_SIZE * 3 + WALL_GAP * 2;
+
+      // Base escura sob todo o escritório
+      const baseGeo = new THREE.BoxGeometry(totalSpan + 0.8, 0.5, totalSpan + 0.8);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x071120, roughness: 0.8 });
+      const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+      baseMesh.position.y = -0.3;
+      baseMesh.receiveShadow = true;
+      baseMesh.name = "OfficeFloorBase";
+      scene.add(baseMesh);
+
+      // Moldura Externa Azul Brilhante (Igual ao contorno azul da planta no print)
+      const outerBorderGeo = new THREE.BoxGeometry(totalSpan + 0.5, 0.35, totalSpan + 0.5);
+      const outerEdges = new THREE.EdgesGeometry(outerBorderGeo);
+      const outerLineMat = new THREE.LineBasicMaterial({ color: 0x0099ff });
+      const outerFrame = new THREE.LineSegments(outerEdges, outerLineMat);
+      outerFrame.position.y = 0.05;
+      scene.add(outerFrame);
+
+      // Construir cada um dos 9 Setores
+      SECTORS_CONFIG.forEach((sector) => {
+        buildSectorRoom(sector);
+      });
+    }
+
+    function buildSectorRoom(sector) {
+      const [gx, gz] = sector.grid;
+      const centerX = gx * (ROOM_SIZE + WALL_GAP);
+      const centerZ = gz * (ROOM_SIZE + WALL_GAP);
+
+      const roomGroup = new THREE.Group();
+      roomGroup.position.set(centerX, 0, centerZ);
+      roomGroup.userData = { sector };
+
+      // 1. Piso do Setor com listras verticais sutis estilo carpete corporativo escuro
+      const floorGeo = new THREE.BoxGeometry(ROOM_SIZE, 0.16, ROOM_SIZE);
+      const floorMat = new THREE.MeshStandardMaterial({
+        color: 0x0a1526,
+        roughness: 0.65,
+        metalness: 0.2
+      });
+      const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+      floorMesh.receiveShadow = true;
+      floorMesh.userData = { isFloor: true, sector };
+      roomGroup.add(floorMesh);
+
+      // Grade interna sutil do setor
+      const roomGrid = new THREE.GridHelper(ROOM_SIZE - 0.4, 7, 0x162b4d, 0x10203a);
+      roomGrid.position.y = 0.1;
+      roomGroup.add(roomGrid);
+
+      // Contorno de Parede / Divisória Azul Ciano do Setor
+      const wallHeight = 1.35;
+      const wallMat = new THREE.MeshStandardMaterial({
+        color: 0x10223d,
+        roughness: 0.4,
+        metalness: 0.3
+      });
+
+      // Parede Norte (Traseira)
+      const backWall = new THREE.Mesh(new THREE.BoxGeometry(ROOM_SIZE, wallHeight, 0.22), wallMat);
+      backWall.position.set(0, wallHeight / 2, -ROOM_SIZE / 2);
+      backWall.castShadow = true;
+      backWall.receiveShadow = true;
+      roomGroup.add(backWall);
+
+      // Friso Neon Superior na Parede Norte
+      const neonTop = new THREE.Mesh(
+        new THREE.BoxGeometry(ROOM_SIZE, 0.07, 0.26),
+        new THREE.MeshBasicMaterial({ color: 0x0088ee })
+      );
+      neonTop.position.set(0, wallHeight, -ROOM_SIZE / 2);
+      roomGroup.add(neonTop);
+
+      // Paredes Laterais Baixas com abertura de passagem
+      const sideWallL = new THREE.Mesh(new THREE.BoxGeometry(0.22, wallHeight, ROOM_SIZE), wallMat);
+      sideWallL.position.set(-ROOM_SIZE / 2, wallHeight / 2, 0);
+      roomGroup.add(sideWallL);
+
+      const sideWallR = new THREE.Mesh(new THREE.BoxGeometry(0.22, wallHeight, ROOM_SIZE), wallMat);
+      sideWallR.position.set(ROOM_SIZE / 2, wallHeight / 2, 0);
+      roomGroup.add(sideWallR);
+
+      // Etiqueta de Título do Setor no Topo da Sala (ex: "2. Sala do Head de Marketing")
+      const headerAnchor = new THREE.Object3D();
+      headerAnchor.position.set(0, 1.8, -ROOM_SIZE / 2 + 1.5);
+      roomGroup.add(headerAnchor);
+      registerHtmlTag(headerAnchor, `
+        <div class="room-header-tag px-2 py-0.5 rounded bg-[#07101e]/85 text-[10px] font-bold text-slate-200 tracking-wide whitespace-nowrap border border-[#1e3557]/70 shadow">
+          ${sector.name}
+        </div>
+      `);
+
+      // Plantas Decorativas Verdes (como na Sala 1 e Sala 2 do print)
+      if (sector.id === 1 || sector.id === 2 || sector.id === 6) {
+        createPlant3D(roomGroup, -ROOM_SIZE / 2 + 1.6, -ROOM_SIZE / 2 + 1.6);
+      }
+      if (sector.id === 2 || sector.id === 3) {
+        createPlant3D(roomGroup, ROOM_SIZE / 2 - 1.6, -ROOM_SIZE / 2 + 1.6);
+      }
+
+      // Estante / Rack Colorido no topo das salas (como na Sala 2 e 6)
+      if (sector.id === 2 || sector.id === 6 || sector.id === 4) {
+        createBookshelfRack(roomGroup, -2.5, -ROOM_SIZE / 2 + 0.55);
+      }
+
+      // Criar Estações de Trabalho (Mesas + Monitores com Logo Falcon + Cadeira + Especialista + Falcão Cristalino 3D)
+      sector.agents.forEach((agentInfo) => {
+        const ws = createAgentWorkstation(sector, agentInfo);
+        ws.position.set(agentInfo.offset[0], 0, agentInfo.offset[1]);
+        roomGroup.add(ws);
+      });
+
+      // Criar Mesas Auxiliares na Recepção (Setor 1) para ter monitor com Logo Falcon também na recepção
+      if (sector.id === 1) {
+        const receptionDesk = createAgentWorkstation(sector, {
+          name: "Recepção Falcon",
+          role: "Onboarding & Identidade",
+          offset: [0, 0.5],
+          shirtColor: 0x0284c7,
+          task: "Recepcionando novas demandas e configurando identidade visual.",
+          hideTag: true
+        });
+        receptionDesk.position.set(0, 0, 0.5);
+        roomGroup.add(receptionDesk);
+      }
+
+      // Criar Totens e Terminais Interativos Azuis (como no print)
+      sector.props.forEach((propInfo) => {
+        createInteractiveTerminal(roomGroup, sector, propInfo);
+      });
+
+      scene.add(roomGroup);
+    }
+
+    // =========================================================================
+    // 5. ESTAÇÃO DE TRABALHO COM LOGO FALCON NO MONITOR + FALCÃO CRISTALINO 3D
+    // =========================================================================
+    function createAgentWorkstation(sector, agentInfo) {
+      const wsGroup = new THREE.Group();
+      wsGroup.userData = {
+        isWorkstation: true,
+        sectorData: sector,
+        agentData: agentInfo
+      };
+
+      // 1. Mesa Executiva Escura com Borda Azulada
+      const deskTopGeo = new THREE.BoxGeometry(3.4, 0.14, 1.75);
+      const deskTopMat = new THREE.MeshStandardMaterial({
+        color: 0x162236,
+        roughness: 0.35,
+        metalness: 0.6
+      });
+      const deskTop = new THREE.Mesh(deskTopGeo, deskTopMat);
+      deskTop.position.set(0, 1.55, 0);
+      deskTop.castShadow = true;
+      deskTop.receiveShadow = true;
+      wsGroup.add(deskTop);
+
+      // Pés laterais da mesa
+      const legGeo = new THREE.BoxGeometry(0.12, 1.55, 1.55);
+      const legMat = new THREE.MeshStandardMaterial({ color: 0x0b1322, metalness: 0.8 });
+      const legL = new THREE.Mesh(legGeo, legMat);
+      legL.position.set(-1.55, 0.77, 0);
+      wsGroup.add(legL);
+      const legR = new THREE.Mesh(legGeo, legMat);
+      legR.position.set(1.55, 0.77, 0);
+      wsGroup.add(legR);
+
+      // 2. MONITOR DUPLO / ULTRAWIDE COM A LOGOTIPO DA FALCON GROWTH NA TELA
+      const standMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25, 0.65, 0.18),
+        legMat
+      );
+      standMesh.position.set(0, 1.9, -0.45);
+      wsGroup.add(standMesh);
+
+      // Chassi do Monitor
+      const frameW = 2.35;
+      const frameH = 1.15;
+      const monitorFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameW, frameH, 0.1),
+        new THREE.MeshStandardMaterial({ color: 0x050a12, roughness: 0.2 })
+      );
+      monitorFrame.position.set(0, 2.35, -0.4);
+      monitorFrame.castShadow = true;
+      wsGroup.add(monitorFrame);
+
+      // TELA FRONTAL E TRASEIRA DO MONITOR EXIBINDO A LOGO FALCON GROWTH
+      const screenPlaneGeo = new THREE.PlaneGeometry(frameW - 0.12, frameH - 0.12);
+      const screenMat = new THREE.MeshBasicMaterial({
+        map: falconMonitorTexture
+      });
+
+      // Tela voltada para o Agente
+      const screenFront = new THREE.Mesh(screenPlaneGeo, screenMat);
+      screenFront.position.set(0, 2.35, -0.34);
+      wsGroup.add(screenFront);
+
+      // Tela voltada para a Câmera (para que o usuário veja nitidamente a logo Falcon em todos os ângulos)
+      const screenBack = new THREE.Mesh(screenPlaneGeo, screenMat);
+      screenBack.position.set(0, 2.35, -0.46);
+      screenBack.rotation.y = Math.PI;
+      wsGroup.add(screenBack);
+
+      // Teclado e Mouse iluminados
+      const kb = new THREE.Mesh(
+        new THREE.BoxGeometry(0.85, 0.04, 0.28),
+        new THREE.MeshStandardMaterial({ color: 0x090f1c })
+      );
+      kb.position.set(0, 1.64, 0.25);
+      wsGroup.add(kb);
+
+      // 3. Cadeira Ergonômica Gamer/Executiva
+      const chairGroup = new THREE.Group();
+      chairGroup.position.set(0, 0, 1.05);
+      const chairMat = new THREE.MeshStandardMaterial({ color: 0x111c30, roughness: 0.5 });
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.12, 0.95), chairMat);
+      seat.position.y = 0.85;
+      chairGroup.add(seat);
+      const backRest = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.15, 0.14), chairMat);
+      backRest.position.set(0, 1.45, 0.42);
+      chairGroup.add(backRest);
+      const chairBase = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 8), legMat);
+      chairBase.position.y = 0.15;
+      chairGroup.add(chairBase);
+      const chairPole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.7, 8), legMat);
+      chairPole.position.y = 0.5;
+      chairGroup.add(chairPole);
+      wsGroup.add(chairGroup);
+
+      // 4. Boneco 3D do Especialista sentado
+      const avatarGroup = new THREE.Group();
+      avatarGroup.position.set(0, 0.82, 0.95);
+
+      const torso = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.32, 0.28, 0.78, 12),
+        new THREE.MeshStandardMaterial({ color: agentInfo.shirtColor || 0x0284c7, roughness: 0.5 })
+      );
+      torso.position.y = 0.45;
+      torso.castShadow = true;
+      avatarGroup.add(torso);
+
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.28, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xf4cbb2, roughness: 0.6 })
+      );
+      head.position.y = 1.05;
+      head.castShadow = true;
+      avatarGroup.add(head);
+
+      const hair = new THREE.Mesh(
+        new THREE.BoxGeometry(0.44, 0.2, 0.46),
+        new THREE.MeshStandardMaterial({ color: 0x1e1b18, roughness: 0.9 })
+      );
+      hair.position.y = 1.2;
+      avatarGroup.add(hair);
+
+      wsGroup.add(avatarGroup);
+
+      // 5. EMBLEMA DE FALCÃO CRISTALINO AZUL 3D GIRANDO 360 LENTAMENTE ACIMA DO AGENTE
+      const falconEmblem = createCrystallineFalconEmblem(false);
+      falconEmblem.position.set(0, 3.85, 0.95);
+      wsGroup.add(falconEmblem);
+      spinningFalconEmblems.push(falconEmblem);
+
+      // 6. Crachá Flutuante Estilo Pill com Ponto Verde (Idêntico ao Print)
+      if (!agentInfo.hideTag) {
+        const tagAnchor = new THREE.Object3D();
+        tagAnchor.position.set(0, 4.55, 0.95);
+        wsGroup.add(tagAnchor);
+
+        const tagEl = registerHtmlTag(tagAnchor, `
+          <div class="falcon-tag bg-[#091324]/95 hover:bg-[#0f213c] border border-[#1e385b] hover:border-[#00a8ff] px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition">
+            <span class="w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_6px_#10b981]"></span>
+            <span class="text-[10.5px] font-bold text-white">${agentInfo.name} (${agentInfo.role})</span>
+          </div>
+        `);
+        tagEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectWorkstation(wsGroup);
+        });
+      }
+
+      interactiveWorkstations.push(wsGroup);
+      return wsGroup;
+    }
+
+    // Cria Totens e Terminais Interativos com Ponto Azul (ex: "Totem Falcon Setup", "Bancada Falcon Studio")
+    function createInteractiveTerminal(parent, sector, propInfo) {
+      const propGroup = new THREE.Group();
+      propGroup.position.set(propInfo.offset[0], 0, propInfo.offset[1]);
+
+      // Pedestal circular luminoso no piso
+      const ringGeo = new THREE.CylinderGeometry(0.75, 0.85, 0.12, 20);
+      const ringMat = new THREE.MeshStandardMaterial({
+        color: 0x0b192e,
+        emissive: 0x0077cc,
+        emissiveIntensity: 0.35
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.position.y = 0.14;
+      propGroup.add(ringMesh);
+
+      // Coluna do Totem com tela Falcon
+      const column = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 1.5, 0.35),
+        new THREE.MeshStandardMaterial({ color: 0x102038, metalness: 0.6, roughness: 0.3 })
+      );
+      column.position.y = 0.85;
+      column.castShadow = true;
+      propGroup.add(column);
+
+      // Tela do Totem também com a Logo Falcon Growth
+      const totemScreen = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.78, 0.55),
+        new THREE.MeshBasicMaterial({ map: falconMonitorTexture })
+      );
+      totemScreen.position.set(0, 1.15, 0.19);
+      propGroup.add(totemScreen);
+
+      const anchor = new THREE.Object3D();
+      anchor.position.set(0, 2.1, 0);
+      propGroup.add(anchor);
+
+      const propEl = registerHtmlTag(anchor, `
+        <div class="interactive-prop-tag bg-[#081528]/95 hover:bg-[#0e2444] border border-[#0099ff]/60 px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-[#38bdf8] shadow-md cursor-pointer whitespace-nowrap">
+          ${propInfo.label}
+        </div>
+      `);
+      propEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        updateCurrentSectorUI(sector);
+        showToast(`Terminal Interativo: ${propInfo.label}`);
+      });
+
+      parent.add(propGroup);
+    }
+
+    function createPlant3D(parent, x, z) {
+      const g = new THREE.Group();
+      g.position.set(x, 0.1, z);
+      const pot = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.45, 0.35, 0.7, 12),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b })
+      );
+      pot.position.y = 0.35;
+      g.add(pot);
+
+      const bush = new THREE.Mesh(
+        new THREE.SphereGeometry(0.75, 14, 14),
+        new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.6 })
+      );
+      bush.position.y = 1.05;
+      bush.castShadow = true;
+      g.add(bush);
+      parent.add(g);
+    }
+
+    function createBookshelfRack(parent, x, z) {
+      const rack = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 1.1, 0.45),
+        new THREE.MeshStandardMaterial({ color: 0x17253b })
+      );
+      rack.position.set(x, 0.65, z);
+      parent.add(rack);
+    }
+
+    // =========================================================================
+    // 6. AVATAR DO DIRETOR ("VOCÊ (DIRETOR)") COM EMBLEMA FALCÃO 3D GIRATÓRIO
+    // =========================================================================
+    function createDirectorAvatar() {
+      directorAvatar = new THREE.Group();
+      // Posicionado inicialmente no Setor 6 (Hub de Vídeo e Roteiros) exatamente como no print
+      const sector6X = 1 * (ROOM_SIZE + WALL_GAP);
+      const sector6Z = 0 * (ROOM_SIZE + WALL_GAP);
+      directorAvatar.position.set(sector6X + 3.2, 0, sector6Z + 1.8);
+
+      // Corpo Executivo
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.36, 0.3, 1.1, 14),
+        new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.3 })
+      );
+      body.position.y = 0.9;
+      body.castShadow = true;
+      directorAvatar.add(body);
+
+      // Cabeça
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.32, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xf5d0b5 })
+      );
+      head.position.y = 1.72;
+      head.castShadow = true;
+      directorAvatar.add(head);
+
+      // Emblema de Falcão Cristalino Azul 3D girando sobre VOCÊ (DIRETOR)
+      const directorFalcon = createCrystallineFalconEmblem(true);
+      directorFalcon.position.set(0, 2.75, 0);
+      directorAvatar.add(directorFalcon);
+      spinningFalconEmblems.push(directorFalcon);
+
+      // Crachá "VOCÊ (DIRETOR)"
+      const dirAnchor = new THREE.Object3D();
+      dirAnchor.position.set(0, 3.45, 0);
+      directorAvatar.add(dirAnchor);
+
+      registerHtmlTag(dirAnchor, `
+        <div class="falcon-tag bg-[#06152d] border-2 border-[#00a8ff] px-3 py-1 rounded-full shadow-[0_0_15px_rgba(0,168,255,0.5)] flex items-center gap-1.5 whitespace-nowrap">
+          <span class="w-2 h-2 rounded-full bg-[#00a8ff] animate-ping"></span>
+          <span class="text-[10.5px] font-extrabold text-white tracking-wide">VOCÊ (DIRETOR)</span>
+        </div>
+      `);
+
+      scene.add(directorAvatar);
+    }
+
+    // =========================================================================
+    // 7. SISTEMA DE PROJEÇÃO HTML 2D/3D PARA ETIQUETAS
+    // =========================================================================
+    function registerHtmlTag(object3D, htmlContent) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = htmlContent.trim();
+      const el = wrapper.firstChild;
+      labelsContainer.appendChild(el);
+
+      registeredHtmlTags.push({
+        element: el,
+        anchor: object3D
+      });
+      return el;
+    }
+
+    function updateHtmlTags() {
+      const v = new THREE.Vector3();
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      registeredHtmlTags.forEach((item) => {
+        if (!item.anchor.parent) {
+          item.element.style.display = "none";
+          return;
+        }
+        item.anchor.getWorldPosition(v);
+        v.project(camera);
+
+        if (v.z > 1) {
+          item.element.style.opacity = "0";
+          return;
+        }
+
+        const x = (v.x * 0.5 + 0.5) * width;
+        const y = (-(v.y * 0.5) + 0.5) * height;
+        item.element.style.opacity = "1";
+        item.element.style.left = `${x}px`;
+        item.element.style.top = `${y}px`;
+      });
+    }
+
+    // =========================================================================
+    // 8. INTERAÇÕES, CLIQUES NO PISO PARA CAMINHAR E GAVETA DE AGENTES
+    // =========================================================================
+    let walkTargetPoint = null;
+
+    function onCanvasClick(event) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+
+      if (intersects.length > 0) {
+        let obj = intersects[0].object;
+
+        // Verificar se clicou em uma Estação de Trabalho / Agente
+        while (obj) {
+          if (obj.userData && obj.userData.isWorkstation) {
+            selectWorkstation(obj);
+            return;
+          }
+          if (obj.userData && obj.userData.isFloor) {
+            // Clicou no piso 3D: caminhar até o ponto clicado e atualizar Setor Atual
+            const hitPoint = intersects[0].point;
+            walkTargetPoint = new THREE.Vector3(hitPoint.x, 0, hitPoint.z);
+            updateCurrentSectorUI(obj.userData.sector);
+            return;
+          }
+          obj = obj.parent;
+        }
+      }
+    }
+
+    function selectWorkstation(wsGroup) {
+      selectedWorkstation = wsGroup;
+      const sector = wsGroup.userData.sectorData;
+      const agent = wsGroup.userData.agentData;
+
+      updateCurrentSectorUI(sector);
+
+      document.getElementById("drawer-agent-name").textContent = agent.name;
+      document.getElementById("drawer-agent-role").textContent = agent.role;
+      document.getElementById("drawer-sector").textContent = sector.name;
+      document.getElementById("drawer-task").textContent = `"${agent.task}"`;
+
+      document.getElementById("agent-drawer").classList.remove("translate-x-[120%]");
+      showToast(`Especialista Selecionado: ${agent.name}`);
+    }
+
+    function updateCurrentSectorUI(sector) {
+      if (!sector) return;
+      document.getElementById("current-sector-name").textContent = sector.name;
+      document.getElementById("current-coords").textContent = sector.coordsLabel || "(30, 11)";
+    }
+
+    function closeDrawer() {
+      document.getElementById("agent-drawer").classList.add("translate-x-[120%]");
+    }
+
+    function focusSectorById(id) {
+      const sec = SECTORS_CONFIG.find(s => s.id === id);
+      if (!sec) return;
+      updateCurrentSectorUI(sec);
+      const targetX = sec.grid[0] * (ROOM_SIZE + WALL_GAP);
+      const targetZ = sec.grid[1] * (ROOM_SIZE + WALL_GAP);
+      controls.target.set(targetX, 0, targetZ);
+      camera.position.set(targetX, 28, targetZ + 22);
+      showToast(`Focando em: ${sec.name}`);
+    }
+
+    // Modo Mobiliar (The Sims)
+    function toggleSimsBuilderMode() {
+      simsBuilderMode = !simsBuilderMode;
+      const btn = document.getElementById("btn-sims-mode");
+      btn.classList.toggle("active-mode", simsBuilderMode);
+
+      if (simsBuilderMode) {
+        showToast("Modo Mobiliar (The Sims) Ativo: Clique em qualquer mesa para girar, excluir ou criar novas!");
+        if (interactiveWorkstations.length > 0 && !selectedWorkstation) {
+          selectWorkstation(interactiveWorkstations[5]);
+        } else if (selectedWorkstation) {
+          document.getElementById("agent-drawer").classList.remove("translate-x-[120%]");
+        }
+      } else {
+        closeDrawer();
+        showToast("Modo Construtor finalizado.");
+      }
+    }
+
+    function switchNav(navId, activateBuilder) {
+      document.getElementById("nav-3d").classList.toggle("active", navId === "nav-3d");
+      document.getElementById("nav-builder").classList.toggle("active", navId === "nav-builder");
+      if (activateBuilder !== simsBuilderMode) {
+        toggleSimsBuilderMode();
+      }
+    }
+
+    function moveSelectedDesk() {
+      if (!selectedWorkstation) return;
+      selectedWorkstation.rotation.y += Math.PI / 2;
+      showToast("Estação girada em 90°!");
+    }
+
+    function deleteSelectedDesk() {
+      if (!selectedWorkstation) return;
+      selectedWorkstation.parent.remove(selectedWorkstation);
+      closeDrawer();
+      showToast("Estação removida do escritório 3D.");
+      selectedWorkstation = null;
+    }
+
+    function spawnNewDesk() {
+      const sec6 = SECTORS_CONFIG[5];
+      const newAgent = {
+        name: "Agente Falcon IA",
+        role: "Especialista Extra",
+        offset: [0, 0],
+        shirtColor: 0x00a8ff,
+        task: "Alocado dinamicamente para acelerar demandas do setor."
+      };
+      const newWs = createAgentWorkstation(sec6, newAgent);
+      newWs.position.set(directorAvatar.position.x - 2.2, 0, directorAvatar.position.z);
+      scene.add(newWs);
+      selectWorkstation(newWs);
+      showToast("Nova Estação Falcon com Monitor e Emblema 3D adicionada!");
+    }
+
+    function sendAgentMessage() {
+      const input = document.getElementById("agent-chat-input");
+      if (!input.value.trim()) return;
+      document.getElementById("drawer-task").textContent = `"Executando agora: ${input.value.trim()}"`;
+      input.value = "";
+      showToast("Demanda enviada diretamente para o especialista!");
+    }
+
+    function openNewDemandModal() {
+      showToast("Nova Demanda: Selecione qualquer especialista no escritório 3D para delegar!");
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById("left-sidebar");
+      sb.classList.toggle("w-60");
+      sb.classList.toggle("w-16");
+      setTimeout(onWindowResize, 220);
+    }
+
+    // =========================================================================
+    // 9. CÂMERA & MOVIMENTAÇÃO DO DIRETOR (WASD / SETAS / CLIQUE NO PISO)
+    // =========================================================================
+    function zoomCamera(delta) {
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+      camera.position.addScaledVector(dir, -delta);
+    }
+
+    function rotateOffice(dir) {
+      const angle = (Math.PI / 6) * dir;
+      const offset = camera.position.clone().sub(controls.target);
+      const x = offset.x * Math.cos(angle) - offset.z * Math.sin(angle);
+      const z = offset.x * Math.sin(angle) + offset.z * Math.cos(angle);
+      camera.position.set(controls.target.x + x, camera.position.y, controls.target.z + z);
+    }
+
+    let isTopView = false;
+    function toggleTopView() {
+      isTopView = !isTopView;
+      if (isTopView) {
+        camera.position.set(0, 62, 0.1);
+        controls.target.set(0, 0, 0);
+        showToast("Visão de Planta 2D/3D Superior Ativada");
+      } else {
+        resetDefaultCamera();
+      }
+    }
+
+    function resetDefaultCamera() {
+      isTopView = false;
+      camera.position.set(0, 46, 38);
+      controls.target.set(0, 0, 1.5);
+      showToast("Câmera Padrão Falcon 3D Restaurada");
+    }
+
+    function onKeyDown(e) {
+      if (e.target.tagName === "INPUT") return;
+      walkTargetPoint = null;
+      if (e.code === "KeyW" || e.code === "ArrowUp") moveState.forward = true;
+      if (e.code === "KeyS" || e.code === "ArrowDown") moveState.backward = true;
+      if (e.code === "KeyA" || e.code === "ArrowLeft") moveState.left = true;
+      if (e.code === "KeyD" || e.code === "ArrowRight") moveState.right = true;
+    }
+
+    function onKeyUp(e) {
+      if (e.code === "KeyW" || e.code === "ArrowUp") moveState.forward = false;
+      if (e.code === "KeyS" || e.code === "ArrowDown") moveState.backward = false;
+      if (e.code === "KeyA" || e.code === "ArrowLeft") moveState.left = false;
+      if (e.code === "KeyD" || e.code === "ArrowRight") moveState.right = false;
+    }
+
+    function startKeyMove(code) {
+      walkTargetPoint = null;
+      if (code === "KeyW") moveState.forward = true;
+      if (code === "KeyS") moveState.backward = true;
+      if (code === "KeyA") moveState.left = true;
+      if (code === "KeyD") moveState.right = true;
+    }
+
+    function stopKeyMove(code) {
+      if (code === "KeyW") moveState.forward = false;
+      if (code === "KeyS") moveState.backward = false;
+      if (code === "KeyA") moveState.left = false;
+      if (code === "KeyD") moveState.right = false;
+    }
+
+    function updateDirectorMovement() {
+      if (!directorAvatar) return;
+
+      const moveVec = new THREE.Vector3();
+      if (moveState.forward) moveVec.z -= 1;
+      if (moveState.backward) moveVec.z += 1;
+      if (moveState.left) moveVec.x -= 1;
+      if (moveState.right) moveVec.x += 1;
+
+      if (moveVec.lengthSq() > 0) {
+        moveVec.normalize();
+        directorAvatar.position.x += moveVec.x * directorSpeed;
+        directorAvatar.position.z += moveVec.z * directorSpeed;
+        directorAvatar.rotation.y = Math.atan2(moveVec.x, moveVec.z);
+      } else if (walkTargetPoint) {
+        const diff = walkTargetPoint.clone().sub(directorAvatar.position);
+        diff.y = 0;
+        if (diff.length() > 0.25) {
+          diff.normalize();
+          directorAvatar.position.x += diff.x * directorSpeed;
+          directorAvatar.position.z += diff.z * directorSpeed;
+          directorAvatar.rotation.y = Math.atan2(diff.x, diff.z);
+        } else {
+          walkTargetPoint = null;
+        }
+      }
+
+      // Manter dentro do perímetro do escritório
+      const limit = 20.5;
+      directorAvatar.position.x = Math.max(-limit, Math.min(limit, directorAvatar.position.x));
+      directorAvatar.position.z = Math.max(-limit, Math.min(limit, directorAvatar.position.z));
+
+      // Atualizar coordenadas no topo conforme o Diretor caminha
+      const coordX = Math.round(directorAvatar.position.x + 20);
+      const coordZ = Math.round(directorAvatar.position.z + 11);
+      document.getElementById("current-coords").textContent = `(${coordX}, ${coordZ})`;
+    }
+
+    // Toast Helper
+    let toastTimer = null;
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-text").textContent = text;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 3000);
+    }
+
+    function onWindowResize() {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    // =========================================================================
+    // 10. LOOP DE RENDERIZAÇÃO E ROTAÇÃO 360° DO EMBLEMA FALCÃO CRISTALINO
+    // =========================================================================
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const elapsedTime = clock.getElapsedTime();
+
+      controls.update();
+      updateDirectorMovement();
+
+      // Girar lentamente em 360° o Emblema 3D do Falcão Cristalino Azul sobre todos os agentes
+      spinningFalconEmblems.forEach((emblem, idx) => {
+        emblem.rotation.y += 0.018; // Giro 360 contínuo e suave
+        emblem.position.y += Math.sin(elapsedTime * 2.5 + idx) * 0.0025; // Flutuação suave
+      });
+
+      updateHtmlTags();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
