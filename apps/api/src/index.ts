@@ -252,7 +252,17 @@ export class FalconGrowthApiServer {
     }
 
     const urlObj = new URL(req.url ?? '/', 'http://localhost');
-    const pathname = urlObj.pathname;
+    let pathname = urlObj.pathname;
+    if (
+      !pathname.startsWith('/api/') &&
+      pathname !== '/' &&
+      pathname !== '/index.html' &&
+      /^\/(health|auth|events|core|office|agents|setup|brand-intelligence|commands|projects|studio|approvals|social|crm|performance)(\/|$)/.test(
+        pathname,
+      )
+    ) {
+      pathname = `/api${pathname}`;
+    }
     const method = req.method ?? 'GET';
 
     // 1. Health Check do FALCON CORE
@@ -959,6 +969,20 @@ export class FalconGrowthApiServer {
   private async readJsonBody(
     req: IncomingMessage,
   ): Promise<Record<string, unknown>> {
+    const preParsed = (req as unknown as { body?: unknown }).body;
+    if (preParsed !== undefined && preParsed !== null) {
+      if (typeof preParsed === 'object' && !Buffer.isBuffer(preParsed)) {
+        return preParsed as Record<string, unknown>;
+      }
+      if (typeof preParsed === 'string') {
+        const trimmed = preParsed.trim();
+        return trimmed ? (JSON.parse(trimmed) as Record<string, unknown>) : {};
+      }
+      if (Buffer.isBuffer(preParsed)) {
+        const trimmed = preParsed.toString('utf8').trim();
+        return trimmed ? (JSON.parse(trimmed) as Record<string, unknown>) : {};
+      }
+    }
     const chunks: Buffer[] = [];
     for await (const chunk of req) {
       chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));

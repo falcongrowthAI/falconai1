@@ -1428,9 +1428,19 @@ export class TenantProvisionerAndRouter {
    * Abre e autentica a instância exclusiva de um tenant registrado no FALCON CORE.
    */
   openTenantDatabaseInstance(organizationId        )                         {
-    const org = this.core.getOrganizationById(organizationId);
+    let org = this.core.getOrganizationById(organizationId);
     if (!org) {
       throw new AuthorizationError('Organização não encontrada no FALCON CORE.');
+    }
+    if (
+      org.status === OrganizationStatus.COMMERCIAL_ONBOARDING &&
+      !this.core.getTenantInstance(organizationId)
+    ) {
+      this.provisionOrganizationTenant({
+        organizationId,
+        actorUserId: 'serverless-auto-provisioner',
+      });
+      org = this.core.getOrganizationById(organizationId) ;
     }
     if (org.status !== OrganizationStatus.ACTIVE) {
       throw new AuthorizationError(
