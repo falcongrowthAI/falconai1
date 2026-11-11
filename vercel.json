@@ -21,8 +21,8 @@
     },
     "webview-ui": {
       "root": "pixel-agents-main/webview-ui",
-      "buildCommand": "node build-vercel.mjs",
-      "outputDirectory": "dist"
+      "runtime": "node",
+      "entrypoint": "src/index.js"
     }
   },
   "rewrites": [
