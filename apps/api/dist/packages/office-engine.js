@@ -356,10 +356,128 @@ export const FALCON_FURNITURE_CATALOG
     blocksMovement: true,
     orientation: Direction.DOWN,
   },
+  'ping-pong-table': {
+    type: 'ping-pong-table',
+    label: 'Mesa de Ping Pong (Breakout)',
+    category: 'decor',
+    footprintW: 3,
+    footprintH: 2,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.DOWN,
+    rotatedType: 'ping-pong-table-vert',
+  },
+  'ping-pong-table-vert': {
+    type: 'ping-pong-table-vert',
+    label: 'Mesa de Ping Pong (Vertical)',
+    category: 'decor',
+    footprintW: 2,
+    footprintH: 3,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.RIGHT,
+    rotatedType: 'ping-pong-table',
+  },
+  'sofa-lounge': {
+    type: 'sofa-lounge',
+    label: 'Sofá Lounge & Confort',
+    category: 'decor',
+    footprintW: 2,
+    footprintH: 1,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.DOWN,
+    rotatedType: 'sofa-lounge-vert',
+  },
+  'sofa-lounge-vert': {
+    type: 'sofa-lounge-vert',
+    label: 'Sofá Lounge (Vertical)',
+    category: 'decor',
+    footprintW: 1,
+    footprintH: 2,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.RIGHT,
+    rotatedType: 'sofa-lounge',
+  },
+  'coffee-table': {
+    type: 'coffee-table',
+    label: 'Mesa de Centro & Café',
+    category: 'decor',
+    footprintW: 1,
+    footprintH: 1,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.DOWN,
+  },
+  'water-cooler': {
+    type: 'water-cooler',
+    label: 'Bebedouro & Water Cooler',
+    category: 'decor',
+    footprintW: 1,
+    footprintH: 1,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.DOWN,
+  },
+  'bookshelf': {
+    type: 'bookshelf',
+    label: 'Estante de Livros & Conhecimento',
+    category: 'decor',
+    footprintW: 2,
+    footprintH: 1,
+    isDesk: false,
+    canPlaceOnSurfaces: false,
+    blocksMovement: true,
+    orientation: Direction.DOWN,
+  },
 };
 
 export function getCatalogItem(type        )                                   {
-  return FALCON_FURNITURE_CATALOG[type];
+  if (FALCON_FURNITURE_CATALOG[type]) return FALCON_FURNITURE_CATALOG[type];
+  const normalized = type.toLowerCase().replace(/_/g, '-');
+  if (FALCON_FURNITURE_CATALOG[normalized]) return FALCON_FURNITURE_CATALOG[normalized];
+  if (type === 'WORKSTATION_DESK' || normalized === 'workstation-desk') {
+    return FALCON_FURNITURE_CATALOG['desk-exec-down'];
+  }
+  if (type === 'CHAIR' || normalized === 'chair') {
+    return FALCON_FURNITURE_CATALOG['chair-ergonomic-up'];
+  }
+  if (type === 'PING_PONG' || normalized === 'ping-pong') {
+    return FALCON_FURNITURE_CATALOG['ping-pong-table'];
+  }
+  if (type === 'SOFA' || normalized === 'sofa') {
+    return FALCON_FURNITURE_CATALOG['sofa-lounge'];
+  }
+  if (type === 'COFFEE_TABLE' || normalized === 'coffee-table') {
+    return FALCON_FURNITURE_CATALOG['coffee-table'];
+  }
+  if (type === 'PLANT' || normalized === 'plant') {
+    return FALCON_FURNITURE_CATALOG['planta-decorativa'];
+  }
+  if (type === 'WATER_COOLER' || normalized === 'water-cooler') {
+    return FALCON_FURNITURE_CATALOG['water-cooler'];
+  }
+  if (type === 'BOOKSHELF' || normalized === 'bookshelf') {
+    return FALCON_FURNITURE_CATALOG['bookshelf'];
+  }
+  return {
+    type,
+    label: type,
+    category: type.toLowerCase().includes('chair') ? 'chairs' : type.toLowerCase().includes('desk') ? 'desks' : 'decor',
+    footprintW: 1,
+    footprintH: 1,
+    isDesk: type.toLowerCase().includes('desk') || type.toLowerCase().includes('workbench'),
+    canPlaceOnSurfaces: false,
+    blocksMovement: !type.toLowerCase().includes('chair'),
+    orientation: Direction.DOWN,
+  };
 }
 
 // ============================================================================

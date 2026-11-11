@@ -544,6 +544,171 @@
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 14px;
     }
+  
+    /* HABBO & THE SIMS INTERACTION CONTROLS */
+    .furniture-action-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(7, 17, 28, 0.96);
+      border: 1px solid #00aef5;
+      box-shadow: 0 8px 32px rgba(0, 174, 245, 0.28), 0 0 0 1px rgba(7, 17, 28, 0.9);
+      border-radius: 14px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 55;
+      backdrop-filter: blur(14px);
+      animation: slideUpFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translate(-50%, 12px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    .furniture-action-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #00aef5;
+      font-weight: 700;
+      font-size: 13px;
+      padding-right: 12px;
+      border-right: 1px solid rgba(45, 128, 213, 0.3);
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .furniture-action-header svg {
+      width: 16px;
+      height: 16px;
+      stroke: #00aef5;
+      stroke-width: 2;
+      fill: none;
+      flex-shrink: 0;
+    }
+    .furniture-action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-furn-action {
+      background: rgba(11, 26, 42, 0.9);
+      border: 1px solid rgba(45, 128, 213, 0.4);
+      color: #f8fafc;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn-furn-action:hover {
+      background: #00aef5;
+      color: #07111c;
+      border-color: #00aef5;
+      box-shadow: 0 0 12px rgba(0, 174, 245, 0.4);
+    }
+    .btn-furn-action.active {
+      background: #00aef5;
+      color: #07111c;
+      border-color: #38bdf8;
+      box-shadow: 0 0 14px rgba(0, 174, 245, 0.6);
+    }
+    .btn-furn-action.btn-danger:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+    }
+    .btn-furn-action svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    /* HABBO QUICK CATALOG MODAL */
+    .habbo-catalog-modal {
+      position: absolute;
+      top: 66px;
+      left: 14px;
+      width: 330px;
+      max-height: calc(100% - 130px);
+      background: rgba(7, 17, 28, 0.97);
+      border: 1px solid rgba(0, 174, 245, 0.45);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      z-index: 52;
+      backdrop-filter: blur(14px);
+      overflow-y: auto;
+      display: none;
+    }
+    .habbo-catalog-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(45, 128, 213, 0.25);
+    }
+    .habbo-catalog-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .habbo-catalog-title svg {
+      width: 16px;
+      height: 16px;
+      stroke: #00aef5;
+      stroke-width: 2;
+      fill: none;
+    }
+    .habbo-catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .habbo-catalog-item {
+      background: #0b1a2a;
+      border: 1px solid #1a3b5c;
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e0f2fe;
+    }
+    .habbo-catalog-item:hover {
+      background: rgba(0, 174, 245, 0.18);
+      border-color: #00aef5;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 174, 245, 0.3);
+    }
+    .habbo-catalog-item svg {
+      width: 24px;
+      height: 24px;
+      stroke: #00aef5;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
   </style>
 </head>
 <body>
@@ -698,6 +863,95 @@
       <div id="office3dContainer" style="width:100%;height:100%;position:relative;">
         <canvas id="office3dCanvas"></canvas>
 
+        
+        <!-- HABBO & THE SIMS QUICK ACTION BAR (FLUTUANTE SOBRE O OBJETO SELECIONADO) -->
+        <div id="furnitureActionBar" class="furniture-action-bar" style="display:none;">
+          <div class="furniture-action-header">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span id="selectedFurnLabel">Móvel Selecionado</span>
+          </div>
+          <div class="furniture-action-buttons">
+            <button class="btn-furn-action" onclick="rotateSelectedFurniture()" title="Girar 90 graus (Igual Habbo e The Sims)">
+              <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              <span>Girar (90°)</span>
+            </button>
+            <button class="btn-furn-action" id="btnMoveFurniture" onclick="toggleMoveModeSelectedFurniture()" title="Mover ou arrastar para outro tile do escritório">
+              <svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+              <span id="btnMoveFurnitureText">Mover</span>
+            </button>
+            <button class="btn-furn-action btn-danger" onclick="removeSelectedFurniture()" title="Remover móvel do escritório (Reciclar)">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Remover</span>
+            </button>
+            <button class="btn-furn-action" onclick="deselectFurniture()" title="Concluir seleção">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span>Fechar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MODAL / PALETA RÁPIDA DE MOBÍLIA (ESTILO HABBO HOTEL & THE SIMS) -->
+        <div id="habboCatalogModal" class="habbo-catalog-modal">
+          <div class="habbo-catalog-top">
+            <span class="habbo-catalog-title">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+              <span>Catálogo de Mobília (The Sims)</span>
+            </span>
+            <button class="drawer-close-btn" onclick="toggleHabboCatalog(false)" title="Fechar Catálogo">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">
+            Clique em qualquer item para posicioná-lo no escritório. Use <strong>Girar</strong>, <strong>Mover</strong> ou <strong>Remover</strong> livremente.
+          </p>
+          <div class="habbo-catalog-grid">
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('WORKSTATION_DESK')">
+              <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M6 21V7"></path><path d="M18 21V7"></path><path d="M2 13h20"></path></svg>
+              <span>Mesa de Trabalho</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('CHAIR')">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M5 21v-4a7 7 0 0 1 14 0v4"></path></svg>
+              <span>Cadeira Gamer/Office</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('PING_PONG')">
+              <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="12" y1="6" x2="12" y2="18"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+              <span>Mesa Ping Pong</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('SOFA')">
+              <svg viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"></path><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"></path></svg>
+              <span>Sofá Lounge Confort</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('COFFEE_TABLE')">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+              <span>Mesa de Centro</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('PLANT')">
+              <svg viewBox="0 0 24 24"><path d="M12 22v-8"></path><path d="M12 14c-4 0-7-3-7-7 4 0 7 3 7 7z"></path><path d="M12 10c4 0 7-3 7-7-4 0-7 3-7 7z"></path></svg>
+              <span>Planta Decorativa</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('BOOKSHELF')">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <span>Estante de Livros</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('WATER_COOLER')">
+              <svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M10 12h4"></path><path d="M12 12v4"></path></svg>
+              <span>Bebedouro & Café</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('CONFERENCE_TABLE')">
+              <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"></rect><line x1="7" y1="16" x2="7" y2="21"></line><line x1="17" y1="16" x2="17" y2="21"></line></svg>
+              <span>Mesa de Reunião</span>
+            </div>
+            <div class="habbo-catalog-item" onclick="addCatalogFurniture('TOTEM')">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              <span>Totem Interativo</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-action" style="flex:1;" onclick="officeUndoRedo('undo')">Desfazer</button>
+            <button class="btn btn-action" style="flex:1;" onclick="officeUndoRedo('redo')">Refazer</button>
+          </div>
+        </div>
+
         <div class="hud-overlay">
           <div class="hud-pill">
             <strong>Setor Atual:</strong>
@@ -706,7 +960,12 @@
             <span id="playerCoordsLabel">(5, 5)</span>
           </div>
           <div class="hud-pill">
-            <span>Câmera 3D:</span>
+            <button class="btn hud-btn-icon" onclick="toggleHabboCatalog()" title="Abrir Catálogo de Mobília (Estilo The Sims / Habbo)">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+              <span>Mobiliar (The Sims)</span>
+            </button>
+            <span style="color:var(--border);">|</span>
+            <span>Câmera:</span>
             <button class="btn hud-btn-icon" onclick="adjustCameraAngle(-0.2)" title="Rotacionar para a esquerda">
               <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
               <span>Girar</span>
@@ -806,7 +1065,7 @@
     ];
 
     const INITIAL_FURNITURE = [
-      // Totens Interativos conectados aos módulos reais do SaaS (sem emojis)
+      // Totens Interativos Oficiais conectados aos módulos reais do SaaS
       { uid: 'totem-setup', type: 'TOTEM', col: 4, row: 3, linkedModule: 'FALCON_SETUP', customLabel: 'Totem Falcon Setup' },
       { uid: 'totem-command', type: 'COMMAND_DESK', col: 16, row: 5, linkedModule: 'FALCON_COMMAND', customLabel: 'Central Falcon Command' },
       { uid: 'totem-brand', type: 'TOTEM', col: 27, row: 4, linkedModule: 'FALCON_BRAND_INTELLIGENCE', customLabel: 'Totem Brand Intelligence' },
@@ -814,15 +1073,51 @@
       { uid: 'totem-approvals', type: 'APPROVAL_BOARD', col: 18, row: 17, linkedModule: 'FALCON_APPROVALS', customLabel: 'Painel de Aprovações' },
       { uid: 'totem-crm', type: 'CRM_TERMINAL', col: 28, row: 18, linkedModule: 'FALCON_CRM', customLabel: 'Terminal Falcon CRM' },
       { uid: 'totem-perf', type: 'PERF_BOARD', col: 2, row: 19, linkedModule: 'FALCON_PERFORMANCE', customLabel: 'Painel Performance' },
-      // Estações de trabalho 3D (Mesas + Monitores) para cada um dos 11 agentes
-      ...INITIAL_AGENTS.map((a, idx) => ({
-        uid: `desk-${a.slug}`,
-        type: 'WORKSTATION_DESK',
-        col: a.col,
-        row: a.row - 0.7,
-        linkedModule: null,
-        customLabel: `Estação #${idx + 1}`
-      }))
+
+      // Estações de trabalho (Mesas Duplas/Quads + Monitores + Cadeiras Ergonômicas) dos 11 Agentes
+      ...INITIAL_AGENTS.flatMap((a, idx) => [
+        {
+          uid: `desk-${a.slug}`,
+          type: 'WORKSTATION_DESK',
+          col: a.col,
+          row: a.row - 1,
+          orientation: 0,
+          customLabel: `Estação #${idx + 1} (${a.name})`
+        },
+        {
+          uid: `chair-${a.slug}`,
+          type: 'CHAIR',
+          col: a.col,
+          row: a.row,
+          orientation: 0,
+          customLabel: `Cadeira #${idx + 1}`
+        }
+      ]),
+
+      // 1. RECEPÇÃO E IDENTIDADE: Balcão, Sofá de Espera, Bebedouro e Planta Ficus
+      { uid: 'reception-desk', type: 'WORKSTATION_DESK', col: 5, row: 2, orientation: 0, customLabel: 'Balcão de Recepção' },
+      { uid: 'reception-chair', type: 'CHAIR', col: 5, row: 3, orientation: 0, customLabel: 'Cadeira Recepção' },
+      { uid: 'reception-sofa', type: 'SOFA', col: 2, row: 5, orientation: 0, customLabel: 'Sofá de Espera' },
+      { uid: 'reception-plant', type: 'PLANT', col: 1, row: 2, orientation: 0, customLabel: 'Planta Ficus' },
+      { uid: 'reception-water', type: 'WATER_COOLER', col: 8, row: 2, orientation: 0, customLabel: 'Bebedouro & Café' },
+
+      // 2. SALA DO HEAD DE MARKETING (DIRETORIA): Estante de Livros e Planta Executiva
+      { uid: 'exec-bookshelf', type: 'BOOKSHELF', col: 12, row: 1, orientation: 0, customLabel: 'Biblioteca de Estratégia' },
+      { uid: 'exec-plant', type: 'PLANT', col: 20, row: 2, orientation: 0, customLabel: 'Planta Sala Diretoria' },
+
+      // 3. ESTRATÉGIA & BRAND INTELLIGENCE: Sofá de Ideação e Mesa de Centro
+      { uid: 'brand-sofa', type: 'SOFA', col: 28, row: 2, orientation: 0, customLabel: 'Sofá de Ideação' },
+      { uid: 'brand-coffee', type: 'COFFEE_TABLE', col: 28, row: 4, orientation: 0, customLabel: 'Mesa de Café' },
+
+      // 6. LOUNGE & SALA DE DESCOMPRESSÃO (ESTILO GATHER.TOWN): Mesa de Ping Pong e Sofás
+      { uid: 'breakout-ping-pong', type: 'PING_PONG', col: 24, row: 9, orientation: 0, customLabel: 'Mesa de Ping Pong (Descompressão)' },
+      { uid: 'lounge-sofa-1', type: 'SOFA', col: 23, row: 13, orientation: 0, customLabel: 'Sofá Lounge Confort 1' },
+      { uid: 'lounge-coffee', type: 'COFFEE_TABLE', col: 25, row: 13, orientation: 0, customLabel: 'Mesa de Centro Lounge' },
+      { uid: 'lounge-sofa-2', type: 'SOFA', col: 26, row: 13, orientation: 0, customLabel: 'Sofá Lounge Confort 2' },
+      { uid: 'breakout-plant', type: 'PLANT', col: 30, row: 9, orientation: 0, customLabel: 'Bambu Ornamental' },
+
+      // 8. SALA DE SOCIAL & REUNIÕES: Mesa de Reuniões Multidisciplinares
+      { uid: 'meeting-conf-table', type: 'CONFERENCE_TABLE', col: 14, row: 18, orientation: 0, customLabel: 'Mesa de Reuniões Executivas' }
     ];
 
     const INITIAL_SETUP_STEPS = [
@@ -915,9 +1210,9 @@
       sidebarCollapsed: false,
       fallbackMode: false,
       camera: {
-        yaw: 0.68,
-        pitch: 0.58,
-        zoom: 1.08,
+        yaw: 0,
+        pitch: 0,
+        zoom: 1.15,
         panX: 0,
         panY: -20
       }
@@ -1156,45 +1451,22 @@
       }
     }
 
-    // RENDERIZADOR 3D VOLUMÉTRICO ISOMÉTRICO DO ESCRITÓRIO VIRTUAL
+    // ============================================================================
+    // MOTOR DE RENDERIZAÇÃO 2.5D GATHER.TOWN & CONTROLADOR HABBO / THE SIMS
+    // ============================================================================
     const canvas = document.getElementById('office3dCanvas');
     const ctx = canvas.getContext('2d');
 
     let isDraggingCamera = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
+    let isDraggingFurniture = false;
+    let dragStartMouseX = 0;
+    let dragStartMouseY = 0;
+    let dragCandidateFurn = null;
     let pointerMoved = false;
 
-    canvas.addEventListener('mousedown', (ev) => {
-      isDraggingCamera = true;
-      pointerMoved = false;
-      dragStartX = ev.clientX - state.camera.panX;
-      dragStartY = ev.clientY - state.camera.panY;
-    });
-    window.addEventListener('mousemove', (ev) => {
-      if (!isDraggingCamera) return;
-      const nx = ev.clientX - dragStartX;
-      const ny = ev.clientY - dragStartY;
-      if (Math.hypot(nx - state.camera.panX, ny - state.camera.panY) > 5) {
-        pointerMoved = true;
-      }
-      state.camera.panX = nx;
-      state.camera.panY = ny;
-    });
-    window.addEventListener('mouseup', () => {
-      isDraggingCamera = false;
-    });
-    canvas.addEventListener('wheel', (ev) => {
-      ev.preventDefault();
-      adjustCameraZoom(ev.deltaY < 0 ? 0.08 : -0.08);
-    }, { passive: false });
-
-    function projectIso3D(col, row, zHeight) {
-      const tileW = 26 * state.camera.zoom;
-      const tileH = 14 * state.camera.zoom;
-      const centerX = canvas.width / 2 + state.camera.panX;
-      const centerY = canvas.height / 2 + state.camera.panY;
-
+    // 1. PROJEÇÃO ORTOGRÁFICA 2.5D (ESTILO GATHER.TOWN)
+    function projectTile(col, row, zHeight = 0) {
+      const tileSize = Math.round(36 * state.camera.zoom);
       const cx = col - 16;
       const cy = row - 11;
       const cos = Math.cos(state.camera.yaw);
@@ -1203,55 +1475,657 @@
       const ry = cx * sin + cy * cos;
 
       return {
-        x: centerX + rx * tileW,
-        y: centerY + ry * tileH - zHeight * state.camera.zoom
+        x: canvas.width / 2 + state.camera.panX + rx * tileSize,
+        y: canvas.height / 2 + state.camera.panY + ry * tileSize - zHeight * state.camera.zoom,
+        size: tileSize
       };
     }
 
-    function drawIsoPrism(col, row, wCols, dRows, zBase, zTop, topColor, leftColor, rightColor, strokeColor) {
-      const b1 = projectIso3D(col, row, zBase);
-      const b2 = projectIso3D(col + wCols, row, zBase);
-      const b3 = projectIso3D(col + wCols, row + dRows, zBase);
-      const b4 = projectIso3D(col, row + dRows, zBase);
+    function unprojectToGrid(screenX, screenY) {
+      const tileSize = Math.round(36 * state.camera.zoom);
+      const dx = (screenX - (canvas.width / 2 + state.camera.panX)) / tileSize;
+      const dy = (screenY - (canvas.height / 2 + state.camera.panY)) / tileSize;
+      const cos = Math.cos(-state.camera.yaw);
+      const sin = Math.sin(-state.camera.yaw);
+      const rx = dx * cos - dy * sin;
+      const ry = dx * sin + dy * cos;
+      return {
+        col: rx + 16,
+        row: ry + 11,
+        tileCol: Math.round(rx + 16),
+        tileRow: Math.round(ry + 11)
+      };
+    }
 
-      const t1 = projectIso3D(col, row, zTop);
-      const t2 = projectIso3D(col + wCols, row, zTop);
-      const t3 = projectIso3D(col + wCols, row + dRows, zTop);
-      const t4 = projectIso3D(col, row + dRows, zTop);
+    // 2. FUNÇÕES DE CONTROLE HABBO & THE SIMS (GIRAR, MOVER, REMOVER, CATÁLOGO)
+    function selectFurniture(uid) {
+      const furn = (state.office.layout.furniture || []).find(f => f.uid === uid);
+      if (!furn) return;
+      state.selectedFurnitureId = uid;
+      state.isMoveMode = false;
 
-      ctx.beginPath();
-      ctx.moveTo(b4.x, b4.y);
-      ctx.lineTo(b3.x, b3.y);
-      ctx.lineTo(t3.x, t3.y);
-      ctx.lineTo(t4.x, t4.y);
-      ctx.closePath();
-      ctx.fillStyle = leftColor;
-      ctx.fill();
+      const bar = document.getElementById('furnitureActionBar');
+      const label = document.getElementById('selectedFurnLabel');
+      const btnMove = document.getElementById('btnMoveFurniture');
+      const btnMoveText = document.getElementById('btnMoveFurnitureText');
 
-      ctx.beginPath();
-      ctx.moveTo(b2.x, b2.y);
-      ctx.lineTo(b3.x, b3.y);
-      ctx.lineTo(t3.x, t3.y);
-      ctx.lineTo(t2.x, t2.y);
-      ctx.closePath();
-      ctx.fillStyle = rightColor;
-      ctx.fill();
+      if (label) label.textContent = furn.customLabel || furn.type;
+      if (btnMove) btnMove.classList.remove('active');
+      if (btnMoveText) btnMoveText.textContent = 'Mover';
+      if (bar) bar.style.display = 'flex';
+    }
 
-      ctx.beginPath();
-      ctx.moveTo(t1.x, t1.y);
-      ctx.lineTo(t2.x, t2.y);
-      ctx.lineTo(t3.x, t3.y);
-      ctx.lineTo(t4.x, t4.y);
-      ctx.closePath();
-      ctx.fillStyle = topColor;
-      ctx.fill();
-      if (strokeColor) {
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 1;
-        ctx.stroke();
+    function deselectFurniture() {
+      state.selectedFurnitureId = null;
+      state.isMoveMode = false;
+      state.dragCandidateFurn = null;
+      state.isDraggingFurniture = false;
+      const bar = document.getElementById('furnitureActionBar');
+      if (bar) bar.style.display = 'none';
+    }
+
+    async function rotateSelectedFurniture() {
+      if (!state.selectedFurnitureId) return;
+      const furn = (state.office.layout.furniture || []).find(f => f.uid === state.selectedFurnitureId);
+      if (!furn) return;
+
+      // Rotaciona em 90 graus (0 -> 1 -> 2 -> 3)
+      furn.orientation = ((furn.orientation || 0) + 1) % 4;
+
+      // Inverte dimensões caso o objeto possua largura e altura assimétricas
+      if (furn.width && furn.height && furn.width !== furn.height) {
+        const tmp = furn.width;
+        furn.width = furn.height;
+        furn.height = tmp;
+      }
+
+      // Sincroniza via API PUT com persistência imediata
+      try {
+        await apiFetch('/api/office/layout', {
+          method: 'PUT',
+          body: JSON.stringify({ action: 'rotate_furniture', uid: furn.uid })
+        });
+      } catch (err) {
+        console.warn('Persistência de rotação offline/local:', err);
       }
     }
 
+    function toggleMoveModeSelectedFurniture() {
+      if (!state.selectedFurnitureId) return;
+      state.isMoveMode = !state.isMoveMode;
+      const btn = document.getElementById('btnMoveFurniture');
+      const btnText = document.getElementById('btnMoveFurnitureText');
+      if (btn) btn.classList.toggle('active', state.isMoveMode);
+      if (btnText) btnText.textContent = state.isMoveMode ? 'Posicionar' : 'Mover';
+    }
+
+    async function removeSelectedFurniture() {
+      if (!state.selectedFurnitureId) return;
+      const uid = state.selectedFurnitureId;
+      const furnList = state.office.layout.furniture || [];
+      const idx = furnList.findIndex(f => f.uid === uid);
+      if (idx !== -1) {
+        furnList.splice(idx, 1);
+      }
+      deselectFurniture();
+
+      try {
+        await apiFetch('/api/office/layout', {
+          method: 'PUT',
+          body: JSON.stringify({ action: 'remove_furniture', uid })
+        });
+      } catch (err) {
+        console.warn('Persistência de remoção offline/local:', err);
+      }
+    }
+
+    function toggleHabboCatalog(forceState) {
+      const modal = document.getElementById('habboCatalogModal');
+      if (!modal) return;
+      if (typeof forceState === 'boolean') {
+        modal.style.display = forceState ? 'block' : 'none';
+      } else {
+        modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+      }
+    }
+
+    async function addCatalogFurniture(type) {
+      const playerCol = state.office.player ? state.office.player.col : 5;
+      const playerRow = state.office.player ? state.office.player.row : 5;
+      const spawnCol = Math.max(2, Math.min(29, playerCol + 1));
+      const spawnRow = Math.max(2, Math.min(19, playerRow));
+      const uid = `furn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
+      const typeLabels = {
+        WORKSTATION_DESK: 'Mesa de Trabalho',
+        CHAIR: 'Cadeira Giratória',
+        PING_PONG: 'Mesa de Ping Pong',
+        SOFA: 'Sofá Lounge Confort',
+        COFFEE_TABLE: 'Mesa de Centro',
+        PLANT: 'Planta Decorativa',
+        BOOKSHELF: 'Estante de Livros',
+        WATER_COOLER: 'Bebedouro & Café',
+        CONFERENCE_TABLE: 'Mesa de Reunião',
+        TOTEM: 'Totem Interativo'
+      };
+
+      const newFurn = {
+        uid,
+        type,
+        col: spawnCol,
+        row: spawnRow,
+        orientation: 0,
+        customLabel: typeLabels[type] || type,
+        sectorId: detectZoneLabel(spawnCol, spawnRow)
+      };
+
+      if (!state.office.layout.furniture) state.office.layout.furniture = [];
+      state.office.layout.furniture.push(newFurn);
+
+      selectFurniture(uid);
+      toggleHabboCatalog(false);
+
+      try {
+        await apiFetch('/api/office/layout', {
+          method: 'PUT',
+          body: JSON.stringify({
+            action: 'place_furniture',
+            type,
+            col: spawnCol,
+            row: spawnRow,
+            sectorId: newFurn.sectorId,
+            customLabel: newFurn.customLabel
+          })
+        });
+      } catch (err) {
+        console.warn('Persistência de inclusão offline/local:', err);
+      }
+    }
+
+    // 3. RENDERIZADOR GATHER.TOWN: PISOS, ZONAS E DIVISÓRIAS
+    function drawGatherFloor(layout, timestamp) {
+      const cols = layout.cols || 32;
+      const rows = layout.rows || 22;
+      const primaryBrand = '#00aef5';
+      const secondaryBrand = '#2d80d5';
+
+      // Base escura do piso corporativo (#07111c)
+      const topLeft = projectTile(0, 0);
+      const bottomRight = projectTile(cols, rows);
+      const floorW = bottomRight.x - topLeft.x;
+      const floorH = bottomRight.y - topLeft.y;
+
+      ctx.fillStyle = '#07111c';
+      ctx.fillRect(topLeft.x, topLeft.y, floorW, floorH);
+
+      // Renderiza as 9 Zonas Oficiais com texturas fiéis ao Gather.town
+      const zonesList = layout.zones || INITIAL_ZONES;
+      for (let zi = 0; zi < zonesList.length; zi++) {
+        const zone = zonesList[zi];
+        const p1 = projectTile(zone.colStart, zone.rowStart);
+        const p2 = projectTile(zone.colStart + zone.width, zone.rowStart + zone.height);
+        const zw = p2.x - p1.x;
+        const zh = p2.y - p1.y;
+
+        // Estilos distintos de piso por zona (Gather.town style):
+        if (zone.id === 'BREAKOUT_GAME_LOUNGE' || zi === 5) {
+          // Carpete listrado azul-ardósia da área de descompressão (ping pong & lounge)
+          const stripeW = Math.max(12, Math.round(18 * state.camera.zoom));
+          const numStripes = Math.ceil(zw / stripeW);
+          for (let s = 0; s < numStripes; s++) {
+            ctx.fillStyle = (s % 2 === 0) ? '#0f263e' : '#173c5f';
+            ctx.fillRect(p1.x + s * stripeW, p1.y, Math.min(stripeW, zw - s * stripeW), zh);
+          }
+        } else if (zone.id === 'EXECUTIVE_COMMAND_ROOM' || zi === 1) {
+          // Piso nobre executivo da sala do Head
+          ctx.fillStyle = '#0a1d30';
+          ctx.fillRect(p1.x, p1.y, zw, zh);
+          // Detalhe de borda corporativa
+          ctx.strokeStyle = 'rgba(0, 174, 245, 0.25)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(p1.x + 4, p1.y + 4, zw - 8, zh - 8);
+        } else if (zone.id === 'RECEPTION_IDENTITY' || zi === 0) {
+          // Piso amadeirado escuro moderno da recepção
+          ctx.fillStyle = '#091624';
+          ctx.fillRect(p1.x, p1.y, zw, zh);
+          // Linhas de ripas de madeira
+          ctx.strokeStyle = '#0d2136';
+          ctx.lineWidth = 1;
+          const slatH = 14 * state.camera.zoom;
+          for (let y = p1.y; y < p1.y + zh; y += slatH) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, y);
+            ctx.lineTo(p1.x + zw, y);
+            ctx.stroke();
+          }
+        } else {
+          // Carpetes tecnológicos das ilhas operacionais (#0c2035 com micro-grid)
+          ctx.fillStyle = '#0b1d30';
+          ctx.fillRect(p1.x, p1.y, zw, zh);
+
+          ctx.strokeStyle = 'rgba(45, 128, 213, 0.08)';
+          ctx.lineWidth = 1;
+          const step = 16 * state.camera.zoom;
+          for (let x = p1.x; x < p1.x + zw; x += step) {
+            ctx.beginPath();
+            ctx.moveTo(x, p1.y);
+            ctx.lineTo(x, p1.y + zh);
+            ctx.stroke();
+          }
+        }
+
+        // Divisórias de vidro e perfis de alumínio entre zonas (estilo Gather.town)
+        ctx.strokeStyle = 'rgba(0, 174, 245, 0.35)';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(p1.x, p1.y, zw, zh);
+
+        // Vão de porta / entrada na borda inferior da sala
+        ctx.strokeStyle = '#07111c';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(p1.x + zw / 2 - 18 * state.camera.zoom, p1.y + zh);
+        ctx.lineTo(p1.x + zw / 2 + 18 * state.camera.zoom, p1.y + zh);
+        ctx.stroke();
+
+        // Placa / Badge flutuante do nome da sala (Sora)
+        const badgeText = zone.label;
+        ctx.font = `700 ${Math.max(9, Math.round(10.5 * state.camera.zoom))}px 'Sora', sans-serif`;
+        const tw = ctx.measureText(badgeText).width + 16;
+        const bx = p1.x + zw / 2 - tw / 2;
+        const by = p1.y + 6;
+
+        ctx.fillStyle = 'rgba(7, 17, 28, 0.88)';
+        ctx.beginPath();
+        ctx.roundRect(bx, by, tw, 18, 9);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0, 174, 245, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.textAlign = 'center';
+        ctx.fillText(badgeText, p1.x + zw / 2, by + 13);
+      }
+
+      // Paredes perimetrais exteriores do escritório
+      ctx.strokeStyle = '#2d80d5';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(topLeft.x, topLeft.y, floorW, floorH);
+    }
+
+    // 4. RENDERIZADOR GATHER.TOWN: MOBÍLIA DETALHADA E INTERATIVIDADE THE SIMS / HABBO
+    function drawGatherFurniture(furn, isSelected, timestamp) {
+      const p = projectTile(furn.col, furn.row);
+      const tileSize = p.size;
+      const pulse = Math.sin(timestamp / 280) * 2;
+      const type = furn.type || 'WORKSTATION_DESK';
+      const rot = furn.orientation || 0; // 0: Sul, 1: Oeste, 2: Norte, 3: Leste
+
+      // HIGHLIGHT DE SELEÇÃO ESTILO THE SIMS / HABBO HOTEL
+      if (isSelected) {
+        const selW = (furn.width || (type === 'PING_PONG' ? 3 : type === 'SOFA' || type === 'BOOKSHELF' ? 2 : 1)) * tileSize;
+        const selH = (furn.height || (type === 'PING_PONG' ? 2 : 1)) * tileSize;
+
+        ctx.fillStyle = 'rgba(0, 255, 200, 0.16)';
+        ctx.fillRect(p.x - 3, p.y - 3, selW + 6, selH + 6);
+
+        ctx.strokeStyle = '#00ffc8';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(p.x - 3, p.y - 3, selW + 6, selH + 6);
+
+        // Brackets / Cantoneiras estilo The Sims
+        const bLen = 8;
+        ctx.lineWidth = 3.5;
+        ctx.strokeStyle = '#38bdf8';
+        // Top-left
+        ctx.beginPath(); ctx.moveTo(p.x - 3, p.y + bLen); ctx.lineTo(p.x - 3, p.y - 3); ctx.lineTo(p.x + bLen, p.y - 3); ctx.stroke();
+        // Top-right
+        ctx.beginPath(); ctx.moveTo(p.x + selW + 3 - bLen, p.y - 3); ctx.lineTo(p.x + selW + 3, p.y - 3); ctx.lineTo(p.x + selW + 3, p.y + bLen); ctx.stroke();
+        // Bottom-left
+        ctx.beginPath(); ctx.moveTo(p.x - 3, p.y + selH + 3 - bLen); ctx.lineTo(p.x - 3, p.y + selH + 3); ctx.lineTo(p.x + bLen, p.y + selH + 3); ctx.stroke();
+        // Bottom-right
+        ctx.beginPath(); ctx.moveTo(p.x + selW + 3 - bLen, p.y + selH + 3); ctx.lineTo(p.x + selW + 3, p.y + selH + 3); ctx.lineTo(p.x + selW + 3, p.y + selH + 3 - bLen); ctx.stroke();
+      }
+
+      // DESENHA CADA TIPO DE MOBÍLIA
+      if (type === 'PING_PONG' || type === 'ping-pong-table') {
+        // MESA DE PING PONG DA SALA DE DESCOMPRESSÃO (ESTILO GATHER.TOWN)
+        const pw = 3 * tileSize - 8;
+        const ph = 2 * tileSize - 8;
+
+        // Sombra da mesa
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fillRect(p.x + 8, p.y + 8, pw, ph);
+
+        // Tampo verde oficial da mesa de ping pong (#10b981)
+        ctx.fillStyle = '#059669';
+        ctx.fillRect(p.x + 4, p.y + 4, pw, ph);
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(p.x + 5, p.y + 5, pw - 2, ph - 4);
+
+        // Bordas brancas oficiais
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(p.x + 6, p.y + 6, pw - 4, ph - 6);
+
+        // Linha central divisória
+        ctx.beginPath();
+        ctx.moveTo(p.x + 6, p.y + 4 + ph / 2);
+        ctx.lineTo(p.x + 4 + pw - 2, p.y + 4 + ph / 2);
+        ctx.stroke();
+
+        // Rede no centro com postes
+        const netX = p.x + 4 + pw / 2;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.fillRect(netX - 2, p.y + 2, 4, ph + 4);
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(netX - 2, p.y + 2, 4, ph + 4);
+
+        // Raquete vermelha e raquete azul na mesa
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath(); ctx.arc(netX - 20, p.y + ph / 2 - 8, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#00aef5';
+        ctx.beginPath(); ctx.arc(netX + 20, p.y + ph / 2 + 8, 5, 0, Math.PI * 2); ctx.fill();
+
+        // Bolinha de ping pong branca
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(netX - 6, p.y + ph / 2 + 4, 2.5, 0, Math.PI * 2); ctx.fill();
+
+      } else if (type === 'SOFA' || type === 'sofa-lounge') {
+        // SOFÁ LOUNGE CONFORTÁVEL
+        const sw = 2 * tileSize - 6;
+        const sh = 1 * tileSize - 6;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(p.x + 6, p.y + 6, sw, sh);
+
+        // Encosto do sofá
+        ctx.fillStyle = '#162e4a';
+        ctx.beginPath(); ctx.roundRect(p.x + 3, p.y + 3, sw, 10, 4); ctx.fill();
+
+        // Almofadas do assento
+        ctx.fillStyle = '#1e4067';
+        ctx.beginPath(); ctx.roundRect(p.x + 3, p.y + 11, sw / 2 - 1, sh - 11, 4); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(p.x + sw / 2 + 3, p.y + 11, sw / 2 - 1, sh - 11, 4); ctx.fill();
+
+        // Almofadas decorativas em azul Falcon
+        ctx.fillStyle = '#00aef5';
+        ctx.fillRect(p.x + 5, p.y + 12, 6, 6);
+        ctx.fillRect(p.x + sw - 8, p.y + 12, 6, 6);
+
+      } else if (type === 'COFFEE_TABLE' || type === 'coffee-table') {
+        // MESA DE CENTRO REDONDA
+        const r = tileSize * 0.42;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.beginPath(); ctx.arc(p.x + tileSize / 2 + 2, p.y + tileSize / 2 + 2, r, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = '#16283b';
+        ctx.beginPath(); ctx.arc(p.x + tileSize / 2, p.y + tileSize / 2, r, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#2d80d5';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Xícara de café sobre a mesa
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath(); ctx.arc(p.x + tileSize / 2, p.y + tileSize / 2, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#451a03';
+        ctx.beginPath(); ctx.arc(p.x + tileSize / 2, p.y + tileSize / 2, 2.2, 0, Math.PI * 2); ctx.fill();
+
+      } else if (type === 'CHAIR' || type.startsWith('chair')) {
+        // CADEIRA GIRATÓRIA ERGONÔMICA COM RODINHAS
+        const cx = p.x + tileSize / 2;
+        const cy = p.y + tileSize / 2;
+
+        // Base com rodinhas
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 7, cy); ctx.lineTo(cx + 7, cy);
+        ctx.moveTo(cx, cy - 7); ctx.lineTo(cx, cy + 7);
+        ctx.stroke();
+
+        // Assento da cadeira
+        ctx.fillStyle = '#1e3857';
+        ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#2d80d5';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Encosto ergonômico posicionado pela orientação
+        ctx.fillStyle = '#0f2238';
+        if (rot === 0) { // Sul
+          ctx.beginPath(); ctx.roundRect(cx - 8, cy - 10, 16, 5, 2); ctx.fill();
+        } else if (rot === 1) { // Oeste
+          ctx.beginPath(); ctx.roundRect(cx + 5, cy - 8, 5, 16, 2); ctx.fill();
+        } else if (rot === 2) { // Norte
+          ctx.beginPath(); ctx.roundRect(cx - 8, cy + 5, 16, 5, 2); ctx.fill();
+        } else { // Leste
+          ctx.beginPath(); ctx.roundRect(cx - 10, cy - 8, 5, 16, 2); ctx.fill();
+        }
+
+      } else if (type === 'PLANT' || type === 'planta-decorativa') {
+        // PLANTA ORNAMENTAL / FICUS
+        const cx = p.x + tileSize / 2;
+        const cy = p.y + tileSize / 2;
+
+        // Vaso de cerâmica
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.arc(cx, cy + 3, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#2d80d5';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Folhas verdes exuberantes (Monstera / Ficus)
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath(); ctx.arc(cx - 5, cy - 2, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 5, cy - 2, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy - 8, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#34d399';
+        ctx.beginPath(); ctx.arc(cx, cy - 4, 5, 0, Math.PI * 2); ctx.fill();
+
+      } else if (type === 'WATER_COOLER' || type === 'water-cooler') {
+        // BEBEDOURO & DISPENSADOR DE ÁGUA
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.fillRect(p.x + 6, p.y + 6, tileSize - 12, tileSize - 12);
+
+        // Gabinete
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.roundRect(p.x + 6, p.y + 10, tileSize - 12, tileSize - 14, 4); ctx.fill();
+
+        // Galão de água translúcido azul
+        ctx.fillStyle = '#00aef5';
+        ctx.beginPath(); ctx.arc(p.x + tileSize / 2, p.y + 10, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath(); ctx.arc(p.x + tileSize / 2 - 2, p.y + 8, 2.5, 0, Math.PI * 2); ctx.fill();
+
+      } else if (type === 'BOOKSHELF' || type === 'bookshelf') {
+        // ESTANTE DE LIVROS E CONHECIMENTO
+        const bw = 2 * tileSize - 6;
+        ctx.fillStyle = '#102235';
+        ctx.fillRect(p.x + 3, p.y + 3, bw, tileSize - 6);
+        ctx.strokeStyle = '#2d80d5';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(p.x + 3, p.y + 3, bw, tileSize - 6);
+
+        // Livros coloridos nas prateleiras
+        const bookColors = ['#00aef5', '#2d80d5', '#38bdf8', '#10b981', '#f59e0b', '#ec4899'];
+        for (let b = 0; b < 8; b++) {
+          ctx.fillStyle = bookColors[b % bookColors.length];
+          ctx.fillRect(p.x + 6 + b * 6.5, p.y + 7, 5, tileSize - 14);
+        }
+
+      } else if (furn.linkedModule || type === 'TOTEM' || type.startsWith('totem-')) {
+        // TOTEM INTERATIVO HOLOGRÁFICO CONECTADO AOS MÓDULOS REAIS DO SAAS
+        const cx = p.x + tileSize / 2;
+        const cy = p.y + tileSize / 2;
+
+        // Base metálica
+        ctx.fillStyle = '#07111c';
+        ctx.beginPath(); ctx.arc(cx, cy, 13, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#00aef5';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Núcleo energético pulsante
+        ctx.fillStyle = '#00aef5';
+        ctx.beginPath(); ctx.arc(cx, cy, 6 + pulse / 2, 0, Math.PI * 2); ctx.fill();
+
+        // Badge flutuante com nome do módulo interativo
+        const label = furn.customLabel || furn.type;
+        ctx.font = `700 ${Math.max(9, Math.round(9.5 * state.camera.zoom))}px 'Sora', sans-serif`;
+        const tw = ctx.measureText(label).width + 12;
+
+        ctx.fillStyle = 'rgba(7, 17, 28, 0.94)';
+        ctx.beginPath(); ctx.roundRect(cx - tw / 2, cy - 22, tw, 16, 8); ctx.fill();
+        ctx.strokeStyle = '#00aef5';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, cx, cy - 10);
+
+      } else {
+        // ESTAÇÃO DE TRABALHO PADRÃO GATHER.TOWN (MESA MODULAR + DUPLO MONITOR GLOW)
+        const dw = tileSize - 4;
+        const dh = tileSize - 6;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(p.x + 4, p.y + 6, dw, dh);
+
+        // Tampo da mesa executiva
+        ctx.fillStyle = '#13283e';
+        ctx.beginPath(); ctx.roundRect(p.x + 2, p.y + 4, dw, dh, 3); ctx.fill();
+        ctx.strokeStyle = '#2d80d5';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 2 Monitores com telas azuis brilhantes (#00aef5)
+        ctx.fillStyle = '#07111c';
+        ctx.fillRect(p.x + 4, p.y + 6, dw / 2 - 2, 7);
+        ctx.fillRect(p.x + dw / 2 + 3, p.y + 6, dw / 2 - 2, 7);
+
+        // Brilho azul da tela
+        ctx.fillStyle = '#00aef5';
+        ctx.fillRect(p.x + 5, p.y + 7, dw / 2 - 4, 5);
+        ctx.fillRect(p.x + dw / 2 + 4, p.y + 7, dw / 2 - 4, 5);
+
+        // Teclado
+        ctx.fillStyle = '#07111c';
+        ctx.fillRect(p.x + dw / 2 - 5, p.y + dh - 4, 10, 4);
+
+        // Caneca de café
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath(); ctx.arc(p.x + dw - 5, p.y + dh - 4, 2, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // 5. RENDERIZADOR GATHER.TOWN: AGENTES & BONECOS COM STATUS PILL ELEGANTE
+    function drawGatherAvatar(ag, isPlayer, timestamp) {
+      const p = projectTile(ag.col, ag.row);
+      const cx = p.x + p.size / 2;
+      const cy = p.y + p.size / 2;
+      const pulse = Math.sin(timestamp / 300) * 2;
+      const bob = Math.sin(timestamp / 240 + (isPlayer ? 0 : (ag.col + ag.row))) * 1.5;
+
+      const stateColors = {
+        AVAILABLE: '#10b981',
+        PLANNING: '#00aef5',
+        EXECUTING: '#2d80d5',
+        REVIEWING: '#38bdf8',
+        AWAITING_APPROVAL: '#f59e0b',
+        COMPLETED: '#10b981',
+        ERROR: '#ef4444'
+      };
+      const statusColor = stateColors[ag.operationalState] || '#10b981';
+
+      // Sombra sob os pés
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 9, 8 * state.camera.zoom, 4 * state.camera.zoom, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (isPlayer) {
+        // Halo pulsante luminoso sob os pés do Diretor
+        ctx.strokeStyle = '#00aef5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 9, (12 + pulse) * state.camera.zoom, (6 + pulse / 2) * state.camera.zoom, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Pernas / Calça
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(cx - 4 * state.camera.zoom, cy + 3 + bob, 3 * state.camera.zoom, 6 * state.camera.zoom);
+      ctx.fillRect(cx + 1 * state.camera.zoom, cy + 3 + bob, 3 * state.camera.zoom, 6 * state.camera.zoom);
+
+      // Torso / Roupas (Jacket / Camisa)
+      ctx.fillStyle = isPlayer ? '#0284c7' : (ag.shirtColor || '#1e3a5f');
+      ctx.beginPath();
+      ctx.roundRect(
+        cx - 6 * state.camera.zoom,
+        cy - 5 * state.camera.zoom + bob,
+        12 * state.camera.zoom,
+        9 * state.camera.zoom,
+        3
+      );
+      ctx.fill();
+
+      // Cabeça com tom de pele
+      ctx.fillStyle = ag.skinColor || '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(cx, cy - 8 * state.camera.zoom + bob, 6.5 * state.camera.zoom, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cabelo estilizado
+      ctx.fillStyle = ag.hairColor || '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(cx, cy - 10 * state.camera.zoom + bob, 6.5 * state.camera.zoom, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // Headset / Fone de ouvido profissional (marca registrada Gather.town)
+      ctx.strokeStyle = '#00aef5';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy - 9 * state.camera.zoom + bob, 7.5 * state.camera.zoom, Math.PI * 0.9, Math.PI * 2.1);
+      ctx.stroke();
+      // Conchas do fone
+      ctx.fillStyle = '#2d80d5';
+      ctx.fillRect(cx - 8.5 * state.camera.zoom, cy - 10 * state.camera.zoom + bob, 2.5 * state.camera.zoom, 4 * state.camera.zoom);
+      ctx.fillRect(cx + 6 * state.camera.zoom, cy - 10 * state.camera.zoom + bob, 2.5 * state.camera.zoom, 4 * state.camera.zoom);
+
+      // FLOATING STATUS PILL ESTILO GATHER.TOWN (EXATAMENTE COMO NA REFERÊNCIA)
+      const pillText = isPlayer ? 'VOCÊ (DIRETOR)' : (ag.roleTitle ? `${ag.name} (${ag.roleTitle})` : ag.name);
+      ctx.font = `700 ${Math.max(9, Math.round(10.5 * state.camera.zoom))}px 'Sora', sans-serif`;
+      const textWidth = ctx.measureText(pillText).width;
+      const pillW = textWidth + 24;
+      const pillH = 18;
+      const pillX = cx - pillW / 2;
+      const pillY = cy - 26 * state.camera.zoom + bob;
+
+      // Cápsula escura translúcida
+      ctx.fillStyle = 'rgba(7, 17, 28, 0.94)';
+      ctx.beginPath();
+      ctx.roundRect(pillX, pillY, pillW, pillH, 9);
+      ctx.fill();
+      ctx.strokeStyle = isPlayer ? '#00aef5' : 'rgba(0, 174, 245, 0.45)';
+      ctx.lineWidth = isPlayer ? 1.5 : 1;
+      ctx.stroke();
+
+      // Ponto de disponibilidade / status do Gather.town (● Verde, Azul, Âmbar)
+      ctx.fillStyle = isPlayer ? '#00aef5' : statusColor;
+      ctx.beginPath();
+      ctx.arc(pillX + 8, pillY + pillH / 2, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Texto do nome / cargo
+      ctx.fillStyle = '#f8fafc';
+      ctx.textAlign = 'left';
+      ctx.fillText(pillText, pillX + 16, pillY + 12.5);
+    }
+
+    // 6. LOOP PRINCIPAL DE RENDERIZAÇÃO 60 FPS (INTUITIVO E SEM TRAVAR)
     function renderOffice3DLoop(timestamp = 0) {
       const w = canvas.clientWidth || canvas.parentElement?.clientWidth || 920;
       const h = canvas.clientHeight || canvas.parentElement?.clientHeight || 640;
@@ -1263,258 +2137,185 @@
 
       if (state.office?.layout && !state.fallbackMode) {
         const layout = state.office.layout;
-        const rawBrand = layout.branding?.primaryColor;
-        const primaryBrand = (!rawBrand || rawBrand === '#f59e0b') ? '#00aef5' : rawBrand;
-        const pulse = Math.sin(timestamp / 380) * 2.2;
 
-        // 0. Laje 3D base do andar corporativo e malha de piso isométrico (#07111c / #00aef5 / #2d80d5)
-        drawIsoPrism(
-          0.4, 0.4, layout.cols - 0.8, layout.rows - 0.8,
-          -6, 0,
-          '#07111c', '#040a11', '#050d17', primaryBrand + '66'
-        );
+        // 1. Renderiza o piso corporativo e zonas
+        drawGatherFloor(layout, timestamp);
 
-        ctx.strokeStyle = 'rgba(0, 174, 245, 0.08)';
-        ctx.lineWidth = 1;
-        for (let c = 1; c < layout.cols; c++) {
-          const a = projectIso3D(c, 1, 0);
-          const b = projectIso3D(c, layout.rows - 1, 0);
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
-        }
-        for (let r = 1; r < layout.rows; r++) {
-          const a = projectIso3D(1, r, 0);
-          const b = projectIso3D(layout.cols - 1, r, 0);
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
+        // 2. Renderiza mobiliário
+        const furnitureList = layout.furniture || INITIAL_FURNITURE;
+        for (const furn of furnitureList) {
+          const isSelected = furn.uid === state.selectedFurnitureId;
+          drawGatherFurniture(furn, isSelected, timestamp);
         }
 
-        // 1. Renderiza os 9 setores oficiais do escritório 3D na paleta oficial
-        const zonesList = layout.zones || INITIAL_ZONES;
-        for (let zi = 0; zi < zonesList.length; zi++) {
-          const zone = zonesList[zi];
-          const zoneColor = (zi % 2 === 0) ? primaryBrand : '#2d80d5';
-          const p1 = projectIso3D(zone.colStart, zone.rowStart, 0.5);
-          const p2 = projectIso3D(zone.colStart + zone.width, zone.rowStart, 0.5);
-          const p3 = projectIso3D(zone.colStart + zone.width, zone.rowStart + zone.height, 0.5);
-          const p4 = projectIso3D(zone.colStart, zone.rowStart + zone.height, 0.5);
-
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.lineTo(p3.x, p3.y);
-          ctx.lineTo(p4.x, p4.y);
-          ctx.closePath();
-          ctx.fillStyle = zoneColor + '22';
-          ctx.fill();
-          ctx.strokeStyle = zoneColor + 'aa';
-          ctx.lineWidth = 1.8;
-          ctx.stroke();
-
-          const center = projectIso3D(zone.colStart + zone.width / 2, zone.rowStart + 1.0, 6);
-          ctx.fillStyle = '#f8fafc';
-          ctx.font = `700 ${Math.max(10, Math.round(11 * state.camera.zoom))}px 'Sora', sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText(zone.label, center.x, center.y);
-        }
-
-        // 2. Renderiza mobiliário 3D volumétrico (estações de trabalho, monitores e totens interativos)
-        for (const furn of layout.furniture || INITIAL_FURNITURE) {
-          if (furn.linkedModule) {
-            drawIsoPrism(
-              furn.col, furn.row, 1.1, 1.1,
-              0, 18,
-              '#00aef5', '#2d80d5', '#1d5fa3', '#7dd3fc'
-            );
-            const top = projectIso3D(furn.col + 0.55, furn.row + 0.55, 23 + pulse);
-            ctx.fillStyle = 'rgba(7, 17, 28, 0.94)';
-            const label = furn.customLabel || furn.type;
-            ctx.font = `700 ${Math.max(9, Math.round(10 * state.camera.zoom))}px 'Sora', sans-serif`;
-            const tw = ctx.measureText(label).width + 12;
-            ctx.fillRect(top.x - tw / 2, top.y - 12, tw, 17);
-            ctx.strokeStyle = '#00aef5';
-            ctx.strokeRect(top.x - tw / 2, top.y - 12, tw, 17);
-            ctx.fillStyle = '#e0f2fe';
-            ctx.textAlign = 'center';
-            ctx.fillText(label, top.x, top.y);
-          } else {
-            drawIsoPrism(
-              furn.col, furn.row, 1.2, 0.8,
-              0, 9,
-              '#11263c', '#0b1929', '#07111c', '#2d80d5'
-            );
-            drawIsoPrism(
-              furn.col + 0.3, furn.row + 0.15, 0.6, 0.18,
-              9, 15,
-              '#00aef5', '#2d80d5', '#1d5fa3', '#bae6fd'
-            );
-          }
-        }
-
-        // 3. Renderiza os 11 Especialistas da Equipe com estados reais
-        const stateColors = {
-          AVAILABLE: '#10b981',
-          PLANNING: '#00aef5',
-          EXECUTING: '#2d80d5',
-          REVIEWING: '#38bdf8',
-          AWAITING_APPROVAL: '#00aef5',
-          COMPLETED: '#10b981',
-          ERROR: '#ef4444'
-        };
-
+        // 3. Renderiza os 11 agentes especialistas
         const agentsList = state.office.agents?.length ? state.office.agents : INITIAL_AGENTS;
         for (let i = 0; i < agentsList.length; i++) {
-          const ag = agentsList[i];
-          const bob = Math.sin(timestamp / 260 + i) * 1.8;
-          const shadowPos = projectIso3D(ag.col + 0.5, ag.row + 0.5, 1);
-          const bodyPos = projectIso3D(ag.col + 0.5, ag.row + 0.5, 13 + bob);
-          const headPos = projectIso3D(ag.col + 0.5, ag.row + 0.5, 22 + bob);
-          const color = stateColors[ag.operationalState] || '#10b981';
-
-          ctx.beginPath();
-          ctx.ellipse(shadowPos.x, shadowPos.y, 10 * state.camera.zoom, 5 * state.camera.zoom, 0, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-          ctx.fill();
-
-          if (ag.operationalState !== 'AVAILABLE') {
-            ctx.beginPath();
-            ctx.ellipse(shadowPos.x, shadowPos.y, (14 + pulse) * state.camera.zoom, (7 + pulse / 2) * state.camera.zoom, 0, 0, Math.PI * 2);
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-          }
-
-          ctx.beginPath();
-          ctx.roundRect(
-            bodyPos.x - 7 * state.camera.zoom,
-            bodyPos.y - 6 * state.camera.zoom,
-            14 * state.camera.zoom,
-            13 * state.camera.zoom,
-            4
-          );
-          ctx.fillStyle = color;
-          ctx.fill();
-          ctx.lineWidth = 1.5;
-          ctx.strokeStyle = '#07111c';
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.arc(headPos.x, headPos.y, 6.5 * state.camera.zoom, 0, Math.PI * 2);
-          ctx.fillStyle = '#f8fafc';
-          ctx.fill();
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = color;
-          ctx.stroke();
-
-          ctx.fillStyle = '#ffffff';
-          ctx.font = `700 ${Math.max(9, Math.round(10.5 * state.camera.zoom))}px 'Sora', sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText(ag.roleTitle || ag.name, headPos.x, headPos.y - 12 * state.camera.zoom);
-
-          ctx.fillStyle = color;
-          ctx.font = `700 ${Math.max(8, Math.round(9.5 * state.camera.zoom))}px 'Sora', sans-serif`;
-          ctx.fillText(`[${ag.operationalState}]`, bodyPos.x, bodyPos.y + 18 * state.camera.zoom);
+          drawGatherAvatar(agentsList[i], false, timestamp);
         }
 
-        // 4. Renderiza o Avatar do Usuário (Movimentação Livre)
+        // 4. Renderiza o jogador / diretor
         if (state.office.player) {
-          const pShadow = projectIso3D(state.office.player.col + 0.5, state.office.player.row + 0.5, 1);
-          const pPos = projectIso3D(state.office.player.col + 0.5, state.office.player.row + 0.5, 20 + pulse);
-
-          ctx.beginPath();
-          ctx.ellipse(pShadow.x, pShadow.y, 13 * state.camera.zoom, 6.5 * state.camera.zoom, 0, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(0, 174, 245, 0.35)';
-          ctx.fill();
-          ctx.strokeStyle = '#00aef5';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.arc(pPos.x, pPos.y, 10.5 * state.camera.zoom, 0, Math.PI * 2);
-          ctx.fillStyle = '#00aef5';
-          ctx.fill();
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = '#ffffff';
-          ctx.stroke();
-
-          ctx.fillStyle = '#00aef5';
-          ctx.font = `700 ${Math.max(10, Math.round(12 * state.camera.zoom))}px 'Sora', sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText('VOCÊ (DIRETOR)', pPos.x, pPos.y - 15 * state.camera.zoom);
+          drawGatherAvatar(state.office.player, true, timestamp);
         }
       }
 
       requestAnimationFrame(renderOffice3DLoop);
     }
 
+    // 7. EVENTOS DE MOUSE, DRAG & DROP E PATHFINDING (HABBO & THE SIMS CONTROLLER)
+    canvas.addEventListener('mousedown', (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = ev.clientX - rect.left;
+      const mouseY = ev.clientY - rect.top;
+      pointerMoved = false;
+
+      // Verifica se clicou sobre algum móvel para iniciar seleção ou arrasto livre (Habbo)
+      const grid = unprojectToGrid(mouseX, mouseY);
+      const furnList = state.office?.layout?.furniture || [];
+      const hitFurn = furnList.find(f => {
+        const fw = f.width || (f.type === 'PING_PONG' ? 3 : f.type === 'SOFA' || f.type === 'BOOKSHELF' ? 2 : 1);
+        const fh = f.height || (f.type === 'PING_PONG' ? 2 : 1);
+        return grid.col >= f.col && grid.col < f.col + fw && grid.row >= f.row && grid.row < f.row + fh;
+      });
+
+      if (hitFurn) {
+        dragCandidateFurn = hitFurn;
+        dragStartMouseX = ev.clientX;
+        dragStartMouseY = ev.clientY;
+      } else {
+        isDraggingCamera = true;
+        dragStartMouseX = ev.clientX - state.camera.panX;
+        dragStartMouseY = ev.clientY - state.camera.panY;
+      }
+    });
+
+    window.addEventListener('mousemove', (ev) => {
+      if (dragCandidateFurn) {
+        const dist = Math.hypot(ev.clientX - dragStartMouseX, ev.clientY - dragStartMouseY);
+        if (dist > 5) {
+          pointerMoved = true;
+          isDraggingFurniture = true;
+          selectFurniture(dragCandidateFurn.uid);
+
+          const rect = canvas.getBoundingClientRect();
+          const grid = unprojectToGrid(ev.clientX - rect.left, ev.clientY - rect.top);
+          dragCandidateFurn.col = Math.max(1, Math.min(30, grid.tileCol));
+          dragCandidateFurn.row = Math.max(1, Math.min(20, grid.tileRow));
+        }
+        return;
+      }
+
+      if (isDraggingCamera) {
+        const nx = ev.clientX - dragStartMouseX;
+        const ny = ev.clientY - dragStartMouseY;
+        if (Math.hypot(nx - state.camera.panX, ny - state.camera.panY) > 5) {
+          pointerMoved = true;
+        }
+        state.camera.panX = nx;
+        state.camera.panY = ny;
+      }
+    });
+
+    window.addEventListener('mouseup', async () => {
+      if (isDraggingFurniture && dragCandidateFurn) {
+        try {
+          await apiFetch('/api/office/layout', {
+            method: 'PUT',
+            body: JSON.stringify({
+              action: 'move_furniture',
+              uid: dragCandidateFurn.uid,
+              col: dragCandidateFurn.col,
+              row: dragCandidateFurn.row
+            })
+          });
+        } catch (err) {
+          console.warn('Persistência de arrasto:', err);
+        }
+      }
+
+      dragCandidateFurn = null;
+      isDraggingFurniture = false;
+      isDraggingCamera = false;
+    });
+
+    canvas.addEventListener('wheel', (ev) => {
+      ev.preventDefault();
+      adjustCameraZoom(ev.deltaY < 0 ? 0.08 : -0.08);
+    }, { passive: false });
+
     canvas.addEventListener('click', async (ev) => {
       if (pointerMoved || !state.office?.layout) return;
       const rect = canvas.getBoundingClientRect();
       const clickX = ev.clientX - rect.left;
       const clickY = ev.clientY - rect.top;
+      const grid = unprojectToGrid(clickX, clickY);
 
-      // Verifica se clicou próximo a um objeto interativo
-      for (const furn of state.office.layout.furniture || INITIAL_FURNITURE) {
-        if (!furn.linkedModule) continue;
-        const p = projectIso3D(furn.col + 0.55, furn.row + 0.55, 16);
-        if (Math.hypot(clickX - p.x, clickY - p.y) < 30) {
-          state.office.player.col = Math.max(1, Math.min(30, Math.round(furn.col)));
-          state.office.player.row = Math.max(1, Math.min(20, Math.round(furn.row + 1)));
-          state.office.player.currentSectorId = detectZoneLabel(state.office.player.col, state.office.player.row);
-          updateHudPlayer();
-          openModule(furn.linkedModule, true);
+      // Se estiver em Modo Mover Mobília (The Sims), posiciona o móvel selecionado no tile clicado
+      if (state.isMoveMode && state.selectedFurnitureId) {
+        const furn = (state.office.layout.furniture || []).find(f => f.uid === state.selectedFurnitureId);
+        if (furn) {
+          furn.col = Math.max(1, Math.min(30, grid.tileCol));
+          furn.row = Math.max(1, Math.min(20, grid.tileRow));
+          toggleMoveModeSelectedFurniture();
           try {
-            const res = await apiFetch('/api/office/interact', {
-              method: 'POST',
-              body: JSON.stringify({ furnitureUid: furn.uid })
+            await apiFetch('/api/office/layout', {
+              method: 'PUT',
+              body: JSON.stringify({
+                action: 'move_furniture',
+                uid: furn.uid,
+                col: furn.col,
+                row: furn.row
+              })
             });
-            if (res?.player) {
-              state.office.player = res.player;
-              updateHudPlayer();
-            }
           } catch {}
           return;
         }
       }
 
+      // Verifica se clicou sobre algum móvel para selecioná-lo (Habbo / The Sims)
+      const furnList = state.office.layout.furniture || [];
+      const clickedFurn = furnList.find(f => {
+        const fw = f.width || (f.type === 'PING_PONG' ? 3 : f.type === 'SOFA' || f.type === 'BOOKSHELF' ? 2 : 1);
+        const fh = f.height || (f.type === 'PING_PONG' ? 2 : 1);
+        return grid.col >= f.col && grid.col < f.col + fw && grid.row >= f.row && grid.row < f.row + fh;
+      });
+
+      if (clickedFurn) {
+        selectFurniture(clickedFurn.uid);
+        // Se for totem conectado e o usuário clicar novamente, abre o módulo
+        if (clickedFurn.linkedModule) {
+          openModule(clickedFurn.linkedModule, true);
+        }
+        return;
+      }
+
       // Verifica se clicou próximo a um dos 11 especialistas
       for (const ag of state.office.agents || INITIAL_AGENTS) {
-        const p = projectIso3D(ag.col + 0.5, ag.row + 0.5, 16);
-        if (Math.hypot(clickX - p.x, clickY - p.y) < 26) {
+        if (Math.hypot(grid.col - ag.col, grid.row - ag.row) < 1.2) {
           openModule('FALCON_AI_TEAM', true);
           return;
         }
       }
 
-      // Caso contrário, encontra o tile mais próximo do clique e navega
-      let bestCol = 5;
-      let bestRow = 5;
-      let bestDist = Infinity;
-      for (let r = 1; r < state.office.layout.rows - 1; r++) {
-        for (let c = 1; c < state.office.layout.cols - 1; c++) {
-          const p = projectIso3D(c + 0.5, r + 0.5, 0);
-          const d = Math.hypot(clickX - p.x, clickY - p.y);
-          if (d < bestDist) {
-            bestDist = d;
-            bestCol = c;
-            bestRow = r;
-          }
-        }
+      // Deseleciona móvel caso tenha clicado no chão livre
+      if (state.selectedFurnitureId) {
+        deselectFurniture();
       }
 
-      state.office.player.col = bestCol;
-      state.office.player.row = bestRow;
-      state.office.player.currentSectorId = detectZoneLabel(bestCol, bestRow);
+      // Move o avatar do usuário até o tile clicado
+      const targetCol = Math.max(1, Math.min(layoutCols() - 2, grid.tileCol));
+      const targetRow = Math.max(1, Math.min(layoutRows() - 2, grid.tileRow));
+
+      state.office.player.col = targetCol;
+      state.office.player.row = targetRow;
+      state.office.player.currentSectorId = detectZoneLabel(targetCol, targetRow);
       updateHudPlayer();
 
       try {
         const res = await apiFetch('/api/office/move', {
           method: 'POST',
-          body: JSON.stringify({ targetCol: bestCol, targetRow: bestRow })
+          body: JSON.stringify({ targetCol, targetRow })
         });
         if (res?.player) {
           state.office.player = res.player;
@@ -1522,6 +2323,9 @@
         }
       } catch {}
     });
+
+    function layoutCols() { return state.office?.layout?.cols || 32; }
+    function layoutRows() { return state.office?.layout?.rows || 22; }
 
     // MENU FLUTUANTE DE COMANDO E MÓDULOS DO SAAS (ZERO EMOJIS, ÍCONES SVG PROFISSIONAIS)
     function getDrawerTopBarHtml(sectionLabel) {
