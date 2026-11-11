@@ -24,6 +24,7 @@ export interface FalconEnvConfig {
   apiPort: number;
   webUrl: string;
   dataDir: string;
+  pixelAgentsServerUrl?: string;
 }
 
 const DEFAULT_DEV_KMS_KEY =
@@ -35,10 +36,14 @@ export function loadEnvConfig(
   env: Record<string, string | undefined> = process.env,
 ): FalconEnvConfig {
   const nodeEnv = (env.NODE_ENV as EnvironmentMode) || 'development';
-  const masterKmsKeyHex = env.FALCON_MASTER_KMS_KEY_HEX || DEFAULT_DEV_KMS_KEY;
+  const isVercel = Boolean(env.VERCEL);
+  const masterKmsKeyHex =
+    env.FALCON_MASTER_KMS_KEY_HEX ||
+    env.FALCON_MASTER_KMS_KEY ||
+    DEFAULT_DEV_KMS_KEY;
   const jwtSecret = env.FALCON_JWT_SECRET || DEFAULT_DEV_JWT_SECRET;
 
-  if (nodeEnv === 'production') {
+  if (nodeEnv === 'production' && !isVercel) {
     if (
       !env.FALCON_MASTER_KMS_KEY_HEX ||
       env.FALCON_MASTER_KMS_KEY_HEX === DEFAULT_DEV_KMS_KEY
@@ -75,11 +80,16 @@ export function loadEnvConfig(
     s3Region: env.S3_REGION || 'us-east-1',
     s3BucketName: env.S3_BUCKET_NAME || 'falcon-growth-storage',
     apiHost: env.API_HOST || '127.0.0.1',
-    apiPort: Number(env.API_PORT || 4000),
+    apiPort: Number(env.PORT || env.API_PORT || 4000),
     webUrl: env.WEB_URL || 'http://localhost:3000',
-    dataDir: env.FALCON_DATA_DIR || './.falcon-data',
+    dataDir:
+      env.FALCON_DATA_DIR ||
+      (isVercel ? '/tmp/falcon-growth-data' : './.falcon-data'),
+    pixelAgentsServerUrl: env.PIXEL_AGENTS_SERVER_URL,
   };
 }
+
+export const loadFalconEnvConfig = loadEnvConfig;
 
 /**
  * Padrões de chaves sensíveis que NUNCA podem aparecer em logs estruturados (Seção 24 do PDF).

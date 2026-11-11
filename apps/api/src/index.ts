@@ -58,8 +58,11 @@ export class FalconGrowthApiServer {
     });
     this.router = new TenantProvisionerAndRouter(this.core);
     this.runtime = new FalconAiRuntime({ core: this.core });
+    const candidateRootWeb = resolve(process.cwd(), 'apps', 'web', 'public');
+    const candidateSiblingWeb = resolve(process.cwd(), '..', 'web', 'public');
     this.webPublicDir =
-      options.webPublicDir ?? resolve(process.cwd(), 'apps', 'web', 'public');
+      options.webPublicDir ??
+      (existsSync(candidateRootWeb) ? candidateRootWeb : candidateSiblingWeb);
   }
 
   getOrCreateOfficeWorld(
@@ -247,10 +250,22 @@ export class FalconGrowthApiServer {
     // 1. Health Check do FALCON CORE
     if (method === 'GET' && pathname === '/api/health') {
       const orgs = this.core.listOrganizations();
+      let pixelAgentsBridgeStatus: string = 'NOT_BOUND';
+      const boundServerUrl = process.env.PIXEL_AGENTS_SERVER_URL;
+      if (boundServerUrl) {
+        try {
+          const bridgeRes = await fetch(new URL('/api/health', boundServerUrl));
+          pixelAgentsBridgeStatus = bridgeRes.ok ? 'CONNECTED' : `HTTP_${bridgeRes.status}`;
+        } catch {
+          pixelAgentsBridgeStatus = 'UNREACHABLE';
+        }
+      }
+
       this.sendJson(res, 200, {
         status: 'OK',
         service: 'FALCON GROWTH SaaS Platform & 3D Virtual Office',
         controlPlane: 'HEALTHY',
+        pixelAgentsBridgeStatus,
         organizationsCount: orgs.length,
         timestamp: new Date().toISOString(),
       });

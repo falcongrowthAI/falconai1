@@ -1,9 +1,40 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "api": {
+      "root": "apps/api",
+      "runtime": "node",
+      "entrypoint": "src/server.ts",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "server",
+          "format": "url",
+          "env": "PIXEL_AGENTS_SERVER_URL"
+        }
+      ]
+    },
+    "server": {
+      "root": "pixel-agents-main/server",
+      "framework": "fastify"
+    },
+    "webview-ui": {
+      "root": "pixel-agents-main/webview-ui",
+      "framework": "vite"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index"
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "api"
+      }
     }
   ]
 }
